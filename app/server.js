@@ -10,6 +10,7 @@ const { pipeline } = require('node:stream/promises');
 const { DatabaseSync, backup: backupSqliteDatabase } = require('node:sqlite');
 const archiver = require('archiver');
 const express = require('express');
+const APP_VERSION = require('./package.json').version;
 const multer = require('multer');
 const QRCode = require('qrcode');
 const unzipper = require('unzipper');
@@ -1325,6 +1326,7 @@ app.get('/api/config', (req, res) => {
   res.json({
     ok: true,
     appId: 'blue-shark-sender',
+    appVersion: APP_VERSION,
     apiVersion: 2,
     token: CSRF_TOKEN,
     maxPdfBytes: MAX_PDF_BYTES

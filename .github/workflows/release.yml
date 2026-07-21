@@ -1,0 +1,89 @@
+name: Build and publish Blue Shark Sender
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Verify tag and application version
+        shell: pwsh
+        run: |
+          $version = (Get-Content version.json -Raw | ConvertFrom-Json).version
+          if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}' -ne "v$version") {
+            throw "Tag ${{ github.ref_name }} does not match version v$version"
+          }
+          "BLUE_SHARK_VERSION=$version" | Out-File $env:GITHUB_ENV -Append
+
+      - name: Install production dependencies
+        working-directory: app
+        run: npm ci --omit=dev --no-audit --no-fund
+
+      - name: Prepare portable runtime
+        shell: pwsh
+        run: |
+          New-Item runtime -ItemType Directory -Force | Out-Null
+          Copy-Item (Get-Command node.exe).Source runtime\node.exe
+          New-Item app\.wwebjs_cache -ItemType Directory -Force | Out-Null
+          Invoke-WebRequest 'https://web.whatsapp.com/' -OutFile 'app\.wwebjs_cache\2.3000.1043280533.html' -TimeoutSec 60
+
+      - name: Build launcher and portable package
+        shell: pwsh
+        run: |
+          .\tools\Build_Launcher.ps1
+          .\tools\Build_Portable.ps1
+
+      - name: Smoke test package structure
+        shell: pwsh
+        run: |
+          $source = 'work\installer-source'
+          New-Item $source -ItemType Directory -Force | Out-Null
+          Expand-Archive 'release\Blue_Shark_WhatsApp_Sender_Portable.zip' $source -Force
+          $root = Join-Path $source 'Blue_Shark_WhatsApp_Sender_Portable'
+          @('BlueSharkSender.exe','runtime\node.exe','app\server.js','app\node_modules','tools\Update_Blue_Shark.ps1','version.json') | ForEach-Object {
+            if (-not (Test-Path (Join-Path $root $_))) { throw "Missing package item: $_" }
+          }
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' installer\BlueSharkSender.iss
+
+      - name: Add installer checksum
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem release\Blue_Shark_Sender_Setup_*.exe | Select-Object -First 1
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash
+          Add-Content release\SHA256SUMS.txt "$hash  $($installer.Name)"
+
+      - name: Validate application
+        working-directory: app
+        run: npm run check
+
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $installer = (Get-ChildItem release\Blue_Shark_Sender_Setup_*.exe | Select-Object -First 1).FullName
+          gh release create '${{ github.ref_name }}' release\Blue_Shark_WhatsApp_Sender_Portable.zip $installer release\SHA256SUMS.txt --title "Blue Shark Sender ${{ github.ref_name }}" --generate-notes
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blue-shark-sender-${{ env.BLUE_SHARK_VERSION }}
+          path: release/*
