@@ -138,3 +138,8 @@ test('system log shows counts and level-specific presentation', () => {
   assert.match(html, /id="clear-error-logs"/);
   assert.match(serverSource, /app\.delete\('\/api\/error-logs'/);
 });
+
+test('entry screen displays the application version returned by config', () => {
+  assert.match(html, /id="app-version-value"/);
+  assert.match(html, /app-version-value'\)\.textContent\s*=\s*config\.appVersion/);
+});

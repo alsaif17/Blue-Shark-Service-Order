@@ -198,7 +198,7 @@
     .language-toggle{border:1px solid #ffffff55;background:#fff;color:var(--navy);border-radius:9px;padding:8px 13px;font:800 12px Arial,Tahoma,sans-serif;cursor:pointer;white-space:nowrap}
     .entry-workspace{width:min(1180px,calc(100vw - 32px));margin:0 auto;padding-bottom:92px;direction:rtl}
     .entry-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,#082f67,#0f4c91);color:#fff;border-radius:18px;padding:20px 24px;margin-bottom:16px;box-shadow:0 8px 26px #062d5f22}
-    .entry-intro h1{margin:0;font-size:25px}.entry-intro p{margin:6px 0 0;color:#dce9fa;font-size:13px}
+    .entry-intro h1{margin:0;font-size:25px}.entry-intro p{margin:6px 0 0;color:#dce9fa;font-size:13px}.entry-version{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:5px 9px;border:1px solid #ffffff55;border-radius:20px;background:#ffffff14;color:#fff;font-size:11px;font-weight:800;direction:ltr}
     .entry-number-badge{min-width:185px;background:#fff;color:var(--navy);border-radius:13px;padding:11px 16px;text-align:center}.entry-number-badge label{display:block;font-size:10px;color:#6c7890;margin-bottom:3px}.entry-number-badge input{width:100%;border:0;background:transparent;color:var(--red);font:900 23px Arial,sans-serif;text-align:center;outline:0}
     .entry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}.entry-grid.order-grid{grid-template-columns:1fr}
     .entry-card{background:#fff;border:1px solid #dce3ee;border-radius:16px;padding:22px;box-shadow:0 3px 16px #092f6120;min-width:0}.entry-card.full{grid-column:1/-1}
@@ -254,6 +254,7 @@
       <div>
         <h1 data-ar="إدخال أمر خدمة" data-en="Service Order Entry">إدخال أمر خدمة</h1>
         <p data-ar="أدخل البيانات فقط، وسيتم تجهيز النموذج تلقائيًا عند الإرسال أو الطباعة." data-en="Enter the details only. The A4 form is prepared automatically when you send or print.">أدخل البيانات فقط، وسيتم تجهيز النموذج تلقائيًا عند الإرسال أو الطباعة.</p>
+        <div class="entry-version"><span data-ar="الإصدار" data-en="Version">الإصدار</span><span id="app-version-value" aria-live="polite">—</span></div>
       </div>
       <div class="entry-number-badge">
         <label for="service-order-number" data-ar="رقم أمر الخدمة" data-en="Service order number">رقم أمر الخدمة</label>
@@ -1770,6 +1771,7 @@
         const config = await response.json();
         if (!response.ok || !config.token) throw new Error('CONFIG_FAILED');
         senderToken = config.token;
+        document.getElementById('app-version-value').textContent = config.appVersion || '—';
         await loadBranches();
         await restoreDraft();
         await advancePastAlreadySavedDraft();
