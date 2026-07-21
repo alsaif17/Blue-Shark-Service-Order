@@ -17,16 +17,16 @@ using Microsoft.Win32;
 [assembly: AssemblyCompany("Blue Shark")]
 [assembly: AssemblyProduct("Blue Shark Sender")]
 [assembly: AssemblyCopyright("Copyright © Blue Shark 2026")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
-[assembly: AssemblyInformationalVersion("1.1.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyInformationalVersion("1.2.0")]
 
 namespace BlueShark.Sender.Launcher
 {
     internal static class Program
     {
         private const string ExpectedAppId = "blue-shark-sender";
-        private const string LauncherVersion = "1.1.0";
+        private const string LauncherVersion = "1.2.0";
         private const int DefaultPort = 32147;
         // First startup can include a verified legacy-session migration and an ACL reset.
         private const int HealthTimeoutSeconds = 300;
@@ -81,6 +81,13 @@ namespace BlueShark.Sender.Launcher
                 RegisterShutdownHandlers();
                 Log("launcher_start version=" + LauncherVersion);
 
+                int updateResult = CheckForApplicationUpdate();
+                if (updateResult == 10)
+                {
+                    Log("update_handoff_started");
+                    return 0;
+                }
+
                 int port;
                 string portError;
                 if (!TryResolvePort(out port, out portError))
@@ -132,6 +139,54 @@ namespace BlueShark.Sender.Launcher
                 }
 
                 Log("launcher_stop");
+            }
+        }
+
+        private static int CheckForApplicationUpdate()
+        {
+            try
+            {
+                string updater = Path.Combine(applicationRoot, "tools", "Update_Blue_Shark.ps1");
+                if (!File.Exists(updater) || IsEnvironmentFlagEnabled("BLUE_SHARK_SKIP_UPDATE"))
+                {
+                    return 0;
+                }
+
+                string powershell = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.System),
+                    "WindowsPowerShell", "v1.0", "powershell.exe");
+                if (!File.Exists(powershell))
+                {
+                    Log("update_check_skipped powershell_missing");
+                    return 0;
+                }
+
+                ProcessStartInfo info = new ProcessStartInfo();
+                info.FileName = powershell;
+                info.Arguments = "-NoProfile -ExecutionPolicy Bypass -File " + QuoteArgument(updater) +
+                    " -Mode Check -CurrentVersion " + QuoteArgument(LauncherVersion) +
+                    " -ParentPid " + Process.GetCurrentProcess().Id;
+                info.WorkingDirectory = applicationRoot;
+                info.UseShellExecute = false;
+                info.CreateNoWindow = true;
+                info.WindowStyle = ProcessWindowStyle.Hidden;
+                using (Process process = Process.Start(info))
+                {
+                    if (process == null) return 0;
+                    if (!process.WaitForExit(360000))
+                    {
+                        try { process.Kill(); } catch { }
+                        Log("update_check_timeout");
+                        return 0;
+                    }
+                    Log("update_check_exit code=" + process.ExitCode);
+                    return process.ExitCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("update_check_error " + SafeException(ex));
+                return 0;
             }
         }
 

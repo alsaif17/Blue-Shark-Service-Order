@@ -14,6 +14,8 @@ data/
 Sent Orders/
 Backups/
 tmp/
+work/
+release/
 app/test-runs/
 app/pdfs/
 

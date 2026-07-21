@@ -7,11 +7,12 @@ $knownWebCacheFile = '2.3000.1043280533.html'
 
 $toolsRoot = Split-Path -Parent $PSCommandPath
 $sourceRoot = Split-Path -Parent $toolsRoot
-$workspaceRoot = Split-Path -Parent $sourceRoot
+$workspaceRoot = $sourceRoot
 $buildRoot = Join-Path $workspaceRoot 'work\portable-package'
 $stagingRoot = Join-Path $buildRoot $packageName
-$zipOutput = Join-Path $workspaceRoot ($packageName + '.zip')
-$hashOutput = Join-Path $workspaceRoot 'SHA256SUMS.txt'
+$releaseRoot = Join-Path $workspaceRoot 'release'
+$zipOutput = Join-Path $releaseRoot ($packageName + '.zip')
+$hashOutput = Join-Path $releaseRoot 'SHA256SUMS.txt'
 $zipTemporary = Join-Path $buildRoot ($packageName + '.zip.tmp')
 $hashTemporary = Join-Path $buildRoot 'SHA256SUMS.txt.tmp'
 
@@ -211,6 +212,7 @@ if ($resolvedStaging.Equals($resolvedSource, [System.StringComparison]::OrdinalI
 }
 
 New-Item -ItemType Directory -Path $resolvedBuild -Force | Out-Null
+New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
 Remove-SafePath $resolvedStaging
 Remove-SafePath $zipTemporary
 Remove-SafePath $hashTemporary
@@ -230,6 +232,7 @@ try {
 
     $rootDocuments = @(Get-ChildItem -LiteralPath $sourceRoot -Force -File | Where-Object {
         $_.Name -like 'README*' -or
+        $_.Name -ceq 'version.json' -or
         $_.Extension -ieq '.cmd' -or
         $_.Name -match '(?i)(NOTICE|LICENSE)'
     })
