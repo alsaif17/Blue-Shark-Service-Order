@@ -90,6 +90,7 @@ test('history details can safely resend the saved PDF through WhatsApp', () => {
 test('polished A4 layout preserves the original logo and compact hierarchy', () => {
   assert.match(html, /\.logo\{grid-area:logo;width:52mm;height:34mm;object-fit:contain\}/);
   assert.match(html, /original Blue Shark logo asset is kept unchanged/);
+  assert.match(html, /content:url\('\/blue-shark-logo-print\.png'\)/);
   assert.match(html, /\.services\{height:78mm\}/);
   assert.match(html, /\.selected-choices\{width:100%;max-height:51mm/);
   assert.match(html, /classList\.toggle\('services-compact', savedServices\.length >= 5\)/);
