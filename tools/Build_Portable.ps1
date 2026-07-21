@@ -32,7 +32,7 @@ function Assert-PathInsideWorkspace {
     $fullWorkspace = Get-NormalizedFullPath $Workspace
     $prefix = $fullWorkspace + [System.IO.Path]::DirectorySeparatorChar
 
-    if ($fullPath.Equals($fullWorkspace, [System.StringComparison]::OrdinalIgnoreCase) -or
+    if (-not $fullPath.Equals($fullWorkspace, [System.StringComparison]::OrdinalIgnoreCase) -and
         -not $fullPath.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "Unsafe path outside workspace: $fullPath"
     }
