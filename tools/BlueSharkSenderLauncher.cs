@@ -17,16 +17,16 @@ using Microsoft.Win32;
 [assembly: AssemblyCompany("Blue Shark")]
 [assembly: AssemblyProduct("Blue Shark Sender")]
 [assembly: AssemblyCopyright("Copyright © Blue Shark 2026")]
-[assembly: AssemblyVersion("1.2.2.0")]
-[assembly: AssemblyFileVersion("1.2.2.0")]
-[assembly: AssemblyInformationalVersion("1.2.2")]
+[assembly: AssemblyVersion("1.2.3.0")]
+[assembly: AssemblyFileVersion("1.2.3.0")]
+[assembly: AssemblyInformationalVersion("1.2.3")]
 
 namespace BlueShark.Sender.Launcher
 {
     internal static class Program
     {
         private const string ExpectedAppId = "blue-shark-sender";
-        private const string LauncherVersion = "1.2.2";
+        private const string LauncherVersion = "1.2.3";
         private const int DefaultPort = 32147;
         // First startup can include a verified legacy-session migration and an ACL reset.
         private const int HealthTimeoutSeconds = 300;

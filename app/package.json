@@ -1,6 +1,6 @@
 {
   "name": "blue-shark-whatsapp-sender",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": true,
   "description": "Portable local Blue Shark service-order sender",
   "main": "server.js",
