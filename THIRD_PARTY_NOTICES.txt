@@ -1,0 +1,31 @@
+Blue Shark Sender - Third-Party Notices
+=======================================
+
+This portable package includes the following principal third-party components:
+
+- Node.js 24.18.0 (MIT and other bundled dependency licenses)
+  https://nodejs.org/
+  The complete Node.js notices are included in runtime\LICENSE.
+
+- whatsapp-web.js 1.34.7 (Apache License 2.0)
+  https://github.com/pedroslopez/whatsapp-web.js
+  A copy of its license is included in licenses\whatsapp-web.js-LICENSE.txt.
+
+- Chrome for Testing 146.0.7680.31 (portable fallback browser)
+  https://googlechromelabs.github.io/chrome-for-testing/
+  It is used only when the installed Microsoft Edge cannot initialize the
+  local WhatsApp session reliably. Chromium's BSD license is included in
+  licenses\chromium-BSD-LICENSE.txt. Additional component notices are
+  available from chrome://credits when the browser is running.
+
+- html2pdf.js 0.14.0 (MIT License)
+  https://github.com/eKoopmans/html2pdf.js
+  A copy of its license is included in licenses\html2pdf.js-LICENSE.txt.
+
+- Express, Multer, QRCode, Puppeteer and their transitive npm dependencies.
+  Package names, versions, and license metadata are recorded in
+  app\package-lock.json and the installed package directories under
+  app\node_modules.
+
+WhatsApp is a trademark of its respective owner. This application is not
+affiliated with, endorsed by, or officially supported by WhatsApp or Meta.

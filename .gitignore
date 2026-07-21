@@ -1,0 +1,29 @@
+# Installed dependencies
+app/node_modules/
+
+# Local WhatsApp/browser session data
+app/.wwebjs_cache/
+app/.wwebjs_auth/
+
+# Portable runtimes and generated executables
+runtime/
+BlueSharkSender.exe
+
+# Local business data and generated output
+data/
+Sent Orders/
+Backups/
+tmp/
+app/test-runs/
+app/pdfs/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
