@@ -29,3 +29,18 @@ app/pdfs/
 Thumbs.db
 .vscode/
 .idea/
+
+# Environment-specific cloud configuration and credentials
+config/cloud.json
+.env
+.env.*
+!.env.example
+signing-private/
+*-private-key.pem
+config/trusted-keys.json
+config/update-root-public-key.pem
+config/release-manifest.json
+config/release-manifest.signed.json
+supabase/.env
+supabase/.env.*
+!supabase/.env.example

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "release_keys": [
+    {
+      "key_id": "release-YYYYMMDD",
+      "status": "active",
+      "public_key_pem": "COPY THE GENERATED RELEASE PUBLIC KEY HERE",
+      "not_before": "2026-01-01T00:00:00.000Z",
+      "not_after": "2027-01-01T00:00:00.000Z"
+    }
+  ],
+  "signature": "ROOT_SIGNATURE_BASE64"
+}

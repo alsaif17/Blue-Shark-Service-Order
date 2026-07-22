@@ -1,0 +1,4 @@
+-- Production data is never seeded from source control.
+-- Create the first Auth user in the Supabase dashboard, then run
+-- supabase/manual/bootstrap_first_admin.example.sql with the new user and pending device IDs.
+-- All later users, branches, memberships, and devices are managed through guarded APIs.

@@ -7,6 +7,7 @@ const test = require('node:test');
 
 const appDir = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(appDir, 'public', 'index.html'), 'utf8');
+const cloudRoutesSource = fs.readFileSync(path.join(appDir, 'lib', 'cloud-routes.js'), 'utf8');
 const serverSource = fs.readFileSync(path.join(appDir, 'server.js'), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(path.join(appDir, 'package.json'), 'utf8'));
 
@@ -80,8 +81,10 @@ test('approved printing advances to a fresh service order number', () => {
 
 test('history details can safely resend the saved PDF through WhatsApp', () => {
   assert.match(html, /id="history-resend-whatsapp"/);
-  assert.match(html, /encodeURIComponent\(selectedHistoryOrder\.orderNumber\) \+ '\/resend'/);
+  assert.match(html, /const resendEndpoint = cloudMode/);
+  assert.match(html, /'\/send-whatsapp'/);
   assert.match(serverSource, /app\.post\('\/api\/orders\/:orderNumber\/resend'/);
+  assert.match(cloudRoutesSource, /router\.post\('\/orders\/:orderId\/send-whatsapp'/);
   assert.match(serverSource, /send_count = send_count \+ 1/);
   assert.match(serverSource, /new MessageMedia\('application\/pdf',[^\n]+, 'Blue Shark\.pdf'\)/);
   assert.match(serverSource, /caption: `مرحبًا \$\{row\.customerName\}،\\n\\nتم إصدار أمر خدمة من Blue Shark\.`/);
@@ -143,4 +146,13 @@ test('system log shows counts and level-specific presentation', () => {
 test('entry screen displays the application version returned by config', () => {
   assert.match(html, /id="app-version-value"/);
   assert.match(html, /app-version-value'\)\.textContent\s*=\s*config\.appVersion/);
+});
+test('cloud document upload checks idempotency before using the document version', () => {
+  const start = cloudRoutesSource.indexOf("router.post('/orders/:orderId/document'");
+  const end = cloudRoutesSource.indexOf("router.post('/orders/:orderId/actions'", start);
+  const route = cloudRoutesSource.slice(start, end);
+  const existingIndex = route.indexOf('const existing = await value.getOrder(orderId);');
+  const uploadIndex = route.indexOf('const result = await value.uploadDocument(');
+  assert.ok(start >= 0 && end > start, 'cloud document route is missing');
+  assert.ok(existingIndex >= 0 && uploadIndex > existingIndex, 'document version is used before the order is loaded');
 });

@@ -1,0 +1,5 @@
+{
+  "supabaseUrl": "https://PROJECT_REF.supabase.co",
+  "supabasePublishableKey": "REPLACE_WITH_PUBLISHABLE_KEY",
+  "requireCloud": false
+}

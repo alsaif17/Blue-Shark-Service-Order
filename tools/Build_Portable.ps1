@@ -1,3 +1,8 @@
+param(
+    [ValidateRange(0, [long]::MaxValue)][long]$ReleaseSequence = 0,
+    [ValidateSet('pilot', 'stable')][string]$UpdateChannel = 'stable'
+)
+
 $ErrorActionPreference = 'Stop'
 
 Set-StrictMode -Version 2.0
@@ -8,7 +13,7 @@ $knownWebCacheFile = '2.3000.1043280533.html'
 $toolsRoot = Split-Path -Parent $PSCommandPath
 $sourceRoot = Split-Path -Parent $toolsRoot
 $workspaceRoot = $sourceRoot
-$buildRoot = Join-Path $workspaceRoot 'work\portable-package'
+$buildRoot = Join-Path ([IO.Path]::GetTempPath()) ("BlueSharkPortableBuild-$PID")
 $stagingRoot = Join-Path $buildRoot $packageName
 $releaseRoot = Join-Path $workspaceRoot 'release'
 $zipOutput = Join-Path $releaseRoot ($packageName + '.zip')
@@ -41,9 +46,12 @@ function Assert-PathInsideWorkspace {
 }
 
 function Remove-SafePath {
-    param([Parameter(Mandatory = $true)][string]$Path)
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [string]$AllowedRoot = $workspaceRoot
+    )
 
-    $safePath = Assert-PathInsideWorkspace -Path $Path -Workspace $workspaceRoot
+    $safePath = Assert-PathInsideWorkspace -Path $Path -Workspace $AllowedRoot
     if (Test-Path -LiteralPath $safePath) {
         Remove-Item -LiteralPath $safePath -Recurse -Force
     }
@@ -200,10 +208,19 @@ if (-not (Test-Path -LiteralPath $sourceRoot -PathType Container)) {
     throw "Package source root is missing: $sourceRoot"
 }
 
+if ($ReleaseSequence -gt 0) {
+    foreach ($relative in @('config\update-root-public-key.pem', 'config\trusted-keys.json')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot $relative) -PathType Leaf)) {
+            throw "Signed release build is missing deployment trust material: $relative"
+        }
+    }
+}
+
 $resolvedWorkspace = Get-NormalizedFullPath $workspaceRoot
+$resolvedTemporary = Get-NormalizedFullPath ([IO.Path]::GetTempPath())
 $resolvedSource = Assert-PathInsideWorkspace -Path $sourceRoot -Workspace $resolvedWorkspace
-$resolvedStaging = Assert-PathInsideWorkspace -Path $stagingRoot -Workspace $resolvedWorkspace
-$resolvedBuild = Assert-PathInsideWorkspace -Path $buildRoot -Workspace $resolvedWorkspace
+$resolvedBuild = Assert-PathInsideWorkspace -Path $buildRoot -Workspace $resolvedTemporary
+$resolvedStaging = Assert-PathInsideWorkspace -Path $stagingRoot -Workspace $resolvedBuild
 $resolvedZip = Assert-PathInsideWorkspace -Path $zipOutput -Workspace $resolvedWorkspace
 $resolvedHash = Assert-PathInsideWorkspace -Path $hashOutput -Workspace $resolvedWorkspace
 
@@ -213,16 +230,21 @@ if ($resolvedStaging.Equals($resolvedSource, [System.StringComparison]::OrdinalI
 
 New-Item -ItemType Directory -Path $resolvedBuild -Force | Out-Null
 New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
-Remove-SafePath $resolvedStaging
-Remove-SafePath $zipTemporary
-Remove-SafePath $hashTemporary
+Remove-SafePath $resolvedStaging -AllowedRoot $resolvedBuild
+Remove-SafePath $zipTemporary -AllowedRoot $resolvedBuild
+Remove-SafePath $hashTemporary -AllowedRoot $resolvedBuild
 
 try {
     New-Item -ItemType Directory -Path $resolvedStaging -Force | Out-Null
 
-    foreach ($directory in @('app', 'runtime', 'licenses', 'tools')) {
+    foreach ($directory in @('app', 'runtime', 'licenses', 'tools', 'config')) {
         Copy-RequiredDirectory -Name $directory -DestinationRoot $resolvedStaging
     }
+    $stagedCloudConfiguration = Join-Path $resolvedStaging 'config\cloud.json'
+    if (Test-Path -LiteralPath $stagedCloudConfiguration) {
+        Remove-Item -LiteralPath $stagedCloudConfiguration -Force
+    }
+
 
     $launcher = Join-Path $sourceRoot 'BlueSharkSender.exe'
     if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
@@ -241,8 +263,16 @@ try {
     }
 
     $stagingCache = Join-Path $resolvedStaging 'app\.wwebjs_cache'
-    Remove-SafePath $stagingCache
+    Remove-SafePath $stagingCache -AllowedRoot $resolvedBuild
     New-Item -ItemType Directory -Path $stagingCache -Force | Out-Null
+
+    $stagedVersionPath = Join-Path $resolvedStaging 'version.json'
+    $stagedVersion = Get-Content -LiteralPath $stagedVersionPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $stagedVersion.releaseSequence = $ReleaseSequence
+    $stagedVersion.updateChannel = $UpdateChannel
+    $stagedVersionJson = $stagedVersion | ConvertTo-Json -Depth 8
+    $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($stagedVersionPath, $stagedVersionJson + [Environment]::NewLine, $utf8WithoutBom)
 
     $knownCacheSource = Join-Path $sourceRoot ('app\.wwebjs_cache\' + $knownWebCacheFile)
     if (-not (Test-Path -LiteralPath $knownCacheSource -PathType Leaf)) {
@@ -280,7 +310,8 @@ try {
     Write-Host "Checksums: $resolvedHash"
 }
 finally {
-    Remove-SafePath $zipTemporary
-    Remove-SafePath $hashTemporary
-    Remove-SafePath $resolvedStaging
+    Remove-SafePath $zipTemporary -AllowedRoot $resolvedBuild
+    Remove-SafePath $hashTemporary -AllowedRoot $resolvedBuild
+    Remove-SafePath $resolvedStaging -AllowedRoot $resolvedBuild
+    Remove-SafePath $resolvedBuild -AllowedRoot $resolvedTemporary
 }
