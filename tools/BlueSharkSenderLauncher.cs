@@ -56,7 +56,14 @@ namespace BlueShark.Sender.Launcher
         private static int Main()
         {
             applicationRoot = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
-            logPath = Path.Combine(applicationRoot, "data", "launcher.log");
+            string programFiles = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))
+                .TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            bool installed = applicationRoot.StartsWith(programFiles, StringComparison.OrdinalIgnoreCase);
+            string dataRoot = installed
+                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BlueShark", "data")
+                : Path.Combine(applicationRoot, "data");
+            Environment.SetEnvironmentVariable("BLUE_SHARK_DATA_DIR", dataRoot);
+            logPath = Path.Combine(dataRoot, "logs", "launcher.log");
 
             string mutexName = BuildPerUserMutexName();
             bool ownsMutex = false;

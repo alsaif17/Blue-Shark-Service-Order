@@ -10,6 +10,8 @@ const { pipeline } = require('node:stream/promises');
 const { DatabaseSync, backup: backupSqliteDatabase } = require('node:sqlite');
 const archiver = require('archiver');
 const express = require('express');
+const { CloudRuntime } = require('./lib/cloud-runtime');
+const { createCloudRouter } = require('./lib/cloud-routes');
 const APP_VERSION = require('./package.json').version;
 const multer = require('multer');
 const QRCode = require('qrcode');
@@ -20,7 +22,16 @@ const APP_ROOT = process.env.BLUE_SHARK_APP_ROOT
   ? path.resolve(process.env.BLUE_SHARK_APP_ROOT)
   : path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const DATA_DIR = path.join(APP_ROOT, 'data');
+const PORTABLE_DATA_DIR = path.join(APP_ROOT, 'data');
+const PROGRAM_FILES_ROOT = process.env.ProgramFiles ? path.resolve(process.env.ProgramFiles) : '';
+const INSTALLED_IN_PROGRAM_FILES = Boolean(
+  PROGRAM_FILES_ROOT && (APP_ROOT === PROGRAM_FILES_ROOT || APP_ROOT.startsWith(PROGRAM_FILES_ROOT + path.sep))
+);
+const DATA_DIR = path.resolve(process.env.BLUE_SHARK_DATA_DIR || (
+  INSTALLED_IN_PROGRAM_FILES && process.env.LOCALAPPDATA
+    ? path.join(process.env.LOCALAPPDATA, 'BlueShark', 'data')
+    : PORTABLE_DATA_DIR
+));
 const LEGACY_SESSION_DIR = path.join(DATA_DIR, 'session');
 let SESSION_DIR = path.resolve(process.env.BLUE_SHARK_SESSION_DIR || (
   process.env.LOCALAPPDATA
@@ -30,8 +41,8 @@ let SESSION_DIR = path.resolve(process.env.BLUE_SHARK_SESSION_DIR || (
 let SESSION_CACHE_DIR = path.join(path.dirname(SESSION_DIR), 'web-cache');
 const TEMP_DIR = path.join(DATA_DIR, 'temp');
 const LOG_DIR = path.join(DATA_DIR, 'logs');
-const BACKUP_DIR = path.join(APP_ROOT, 'Backups');
-const SENT_DIR = path.join(APP_ROOT, 'Sent Orders');
+const BACKUP_DIR = path.join(INSTALLED_IN_PROGRAM_FILES ? DATA_DIR : APP_ROOT, 'Backups');
+const SENT_DIR = path.join(INSTALLED_IN_PROGRAM_FILES ? DATA_DIR : APP_ROOT, 'Sent Orders');
 const SENT_INDEX_PATH = path.join(DATA_DIR, 'sent-orders.json');
 const DATABASE_PATH = path.join(DATA_DIR, 'blue-shark.db');
 const portArgumentIndex = process.argv.indexOf('--port');
@@ -709,6 +720,7 @@ function startHeartbeat() {
 }
 
 let database = null;
+let cloudRuntime = null;
 let startupReady = false;
 
 function initializeDatabase() {
@@ -1293,7 +1305,10 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '128kb' }));
 app.use((req, res, next) => {
   const origin = req.get('origin');
+  const host = String(req.get('host') || '').toLowerCase();
+  const allowedHosts = new Set([`${HOST}:${PORT}`, `localhost:${PORT}`]);
   const allowedOrigins = [`http://${HOST}:${PORT}`, `http://localhost:${PORT}`];
+  if (!allowedHosts.has(host)) return res.status(403).json({ ok: false, code: 'HOST_REJECTED' });
   if (origin && !allowedOrigins.includes(origin)) return res.status(403).json({ ok: false, code: 'ORIGIN_REJECTED' });
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -1329,7 +1344,11 @@ app.get('/api/config', (req, res) => {
     appVersion: APP_VERSION,
     apiVersion: 2,
     token: CSRF_TOKEN,
-    maxPdfBytes: MAX_PDF_BYTES
+    maxPdfBytes: MAX_PDF_BYTES,
+    cloud: {
+      enabled: Boolean(cloudRuntime?.enabled),
+      required: Boolean(cloudRuntime?.configuration?.required)
+    }
   });
 });
 
@@ -1617,6 +1636,48 @@ const upload = multer({
   }
 });
 
+async function runExclusiveSend(operation) {
+  if (sendInProgress) {
+    throw Object.assign(new Error('Another send is in progress'), { code: 'BUSY', status: 429 });
+  }
+  sendInProgress = true;
+  try {
+    return await operation();
+  } finally {
+    sendInProgress = false;
+  }
+}
+
+async function deliverCentralWhatsApp({ phone, pdf, caption }) {
+  if (senderState.state !== 'ready' || !waClient) {
+    throw Object.assign(new Error('WhatsApp is not ready'), { code: 'WHATSAPP_NOT_READY', status: 503 });
+  }
+  const normalized = normalizeInternationalPhone(phone);
+  if (!normalized) throw Object.assign(new Error('Invalid phone'), { code: 'INVALID_PHONE', status: 400 });
+  const registeredId = await withTimeout(waClient.getNumberId(normalized), 20000, 'NUMBER_LOOKUP_TIMEOUT');
+  if (!registeredId) {
+    throw Object.assign(new Error('Phone is not registered'), { code: 'NUMBER_NOT_REGISTERED', status: 422 });
+  }
+  const media = new MessageMedia('application/pdf', pdf.toString('base64'), 'Blue Shark.pdf');
+  try {
+    const message = await withTimeout(waClient.sendMessage(registeredId._serialized, media, {
+      caption,
+      sendMediaAsDocument: true
+    }), 90000, 'SEND_TIMEOUT');
+    return { messageId: message?.id?._serialized || `local-${crypto.randomUUID()}` };
+  } catch (error) {
+    error.externalEffectStarted = true;
+    throw error;
+  }
+}
+
+app.use('/api/cloud', requireToken, createCloudRouter({
+  getRuntime: () => cloudRuntime,
+  upload,
+  runExclusiveSend,
+  deliverWhatsApp: deliverCentralWhatsApp
+}));
+
 app.post('/api/send-order', requireToken, upload.single('pdf'), async (req, res) => {
   if (sendInProgress) return res.status(429).json({ ok: false, code: 'BUSY' });
   if (senderState.state !== 'ready' || !waClient) return res.status(503).json({ ok: false, code: 'WHATSAPP_NOT_READY' });
@@ -1764,15 +1825,17 @@ app.use((error, req, res, next) => {
   res.status(500).json({ ok: false, code: 'INTERNAL_ERROR' });
 });
 
-const server = app.listen(PORT, HOST, (listenError) => {
+const server = app.listen(PORT, HOST, async (listenError) => {
   if (listenError) return;
   try {
     const staleBrowsersStopped = stopStaleBrowserProcesses([LEGACY_SESSION_DIR, SESSION_DIR]);
     prepareSessionDirectory({ allowMigration: staleBrowsersStopped });
     database = new DatabaseSync(DATABASE_PATH);
     initializeDatabase();
+    cloudRuntime = new CloudRuntime(APP_ROOT, DATA_DIR);
+    await cloudRuntime.initialize();
   } catch (error) {
-    setSenderState('error', { errorCode: 'SESSION_PREPARE_FAILED' });
+    setSenderState('error', { errorCode: error.code || 'STARTUP_PREPARE_FAILED' });
     logEvent('error', 'startup_prepare_failed', { code: error.code || error.name });
     setImmediate(() => shutdown('startup_prepare_failed', 1).catch(() => process.exit(1)));
     return;
@@ -1781,6 +1844,7 @@ const server = app.listen(PORT, HOST, (listenError) => {
   logEvent('info', 'server_started', {
     port: PORT,
     browser: browserExecutable ? path.basename(browserExecutable) : 'missing',
+    cloud: cloudRuntime.enabled ? 'configured' : 'legacy',
     session: path.resolve(SESSION_DIR).toLowerCase() === path.resolve(LEGACY_SESSION_DIR).toLowerCase() ? 'legacy' : 'local'
   });
   startHeartbeat();
@@ -1827,6 +1891,7 @@ async function shutdown(reason, exitCode = 0) {
       logEvent('warn', 'client_cleanup_during_shutdown_failed', { code: cleanupError.code || cleanupError.name });
     }
   }
+  try { if (cloudRuntime) cloudRuntime.close(); } catch (error) {}
   try { if (database) database.close(); } catch (error) {}
   process.exit(exitCode);
 }

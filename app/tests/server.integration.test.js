@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const http = require('node:http');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
@@ -109,6 +110,21 @@ async function jsonRequest(url, options = {}) {
   return { response, body };
 }
 
+async function httpJsonRequest(url, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const request = http.get(url, { headers }, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => {
+        let body = null;
+        try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch (error) {}
+        resolve({ response, body });
+      });
+    });
+    request.on('error', reject);
+  });
+}
+
 async function createConfiguredBranch(baseUrl, token, suffix = '001') {
   const result = await jsonRequest(`${baseUrl}/api/branches`, {
     method: 'POST',
@@ -194,6 +210,18 @@ test('local API, security headers, counters, branches, and crash recovery', asyn
   assert.match(configResult.response.headers.get('content-security-policy') || '', /frame-ancestors 'none'/);
   const token = configResult.body.token;
   assert.ok(token && token.length >= 32);
+
+  const rejectedHost = await httpJsonRequest(`${running.baseUrl}/api/config`, {
+    Host: `attacker.invalid:${firstPort}`
+  });
+  assert.equal(rejectedHost.response.statusCode, 403);
+  assert.equal(rejectedHost.body.code, 'HOST_REJECTED');
+
+  const rejectedOrigin = await jsonRequest(`${running.baseUrl}/api/config`, {
+    headers: { Origin: 'https://attacker.invalid' }
+  });
+  assert.equal(rejectedOrigin.response.status, 403);
+  assert.equal(rejectedOrigin.body.code, 'ORIGIN_REJECTED');
 
   const denied = await jsonRequest(`${running.baseUrl}/api/branches`);
   assert.equal(denied.response.status, 403);

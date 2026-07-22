@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "release_sequence": 1,
+  "version": "1.3.0",
+  "channel": "stable",
+  "minimum_sequence": 0,
+  "package_path": "stable/1/package.zip",
+  "size": 1,
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "published_at": "2026-07-22T00:00:00.000Z",
+  "rollout_cohort": "all",
+  "mandatory_after": null,
+  "signing_key_id": "release-YYYYMMDD",
+  "signature": "SIGN_WITH_TOOLS_SCRIPT"
+}

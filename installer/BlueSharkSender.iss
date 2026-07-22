@@ -8,9 +8,9 @@ AppId={{0AFA1EDB-8EAB-45E7-922A-CAAC0E83EA1D}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={localappdata}\Programs\Blue Shark Sender
+DefaultDirName={autopf}\BlueShark
 DefaultGroupName={#MyAppName}
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 OutputDir=..\release
 OutputBaseFilename=Blue_Shark_Sender_Setup_{#MyAppVersion}
 Compression=lzma2/ultra64
@@ -39,3 +39,4 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Run {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File ""{app}\tools\Install_Update_Agent.ps1"" -InstallRoot ""{app}"""; Flags: runhidden waituntilterminated

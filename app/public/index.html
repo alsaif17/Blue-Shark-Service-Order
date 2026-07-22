@@ -196,6 +196,15 @@
     :is(#service-order-template,.pdf-export-sheet) .footer{margin-top:auto;padding-top:1.5mm;border-top:.25mm solid #dce3ec;font-size:7.5px;font-weight:600;line-height:1.55;color:#59687d}
     :is(#service-order-template,.pdf-export-sheet) .footer .en{font-size:7px;color:#788498}
     .language-toggle{border:1px solid #ffffff55;background:#fff;color:var(--navy);border-radius:9px;padding:8px 13px;font:800 12px Arial,Tahoma,sans-serif;cursor:pointer;white-space:nowrap}
+    .cloud-session-badge{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px Arial,Tahoma,sans-serif;color:var(--navy)}
+    .cloud-logout{border-color:#d8dee8;color:#8b1724}
+    .auth-gate{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:20px;background:linear-gradient(145deg,#001a44f2,#073a6df2)}
+    .auth-card{width:min(420px,100%);box-sizing:border-box;background:#fff;border-radius:18px;padding:28px;box-shadow:0 24px 70px #0007;text-align:right}
+    .auth-card h2{margin:0 0 8px;color:var(--navy)}.auth-card p{color:#526074;line-height:1.7}
+    .auth-field{display:grid;gap:6px;margin:14px 0}.auth-field label{font-weight:800;color:var(--navy)}
+    .auth-field input{height:44px;border:1px solid #cbd4e1;border-radius:9px;padding:0 12px;font:15px Arial,Tahoma,sans-serif;direction:ltr}
+    .auth-submit{width:100%;height:44px;border:0;border-radius:9px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer}
+    .auth-submit:disabled{opacity:.55}.auth-message{min-height:24px;color:var(--red)!important;font-weight:700}
     .entry-workspace{width:min(1180px,calc(100vw - 32px));margin:0 auto;padding-bottom:92px;direction:rtl}
     .entry-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,#082f67,#0f4c91);color:#fff;border-radius:18px;padding:20px 24px;margin-bottom:16px;box-shadow:0 8px 26px #062d5f22}
     .entry-intro h1{margin:0;font-size:25px}.entry-intro p{margin:6px 0 0;color:#dce9fa;font-size:13px}.entry-version{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:5px 9px;border:1px solid #ffffff55;border-radius:20px;background:#ffffff14;color:#fff;font-size:11px;font-weight:800;direction:ltr}
@@ -226,6 +235,21 @@
     @media print{.app-header,.services .choice-row,.services .custom-choice,.services .service-save-row,.add-choice,.service-group button,.form-actions,.required-note,.sender-panel,.modal-backdrop,.toast{display:none!important}.app-view{display:none!important}#view-new{display:block!important}.selected-choices{max-height:52mm;overflow:visible;font-size:10px;gap:1.5mm}.service-group{background:#fff;break-inside:avoid;padding:1.2mm 2mm}.selected-heading{padding-top:2mm;font-size:10px}.services> .writing> .service-select{font-size:10.5px}input[type=date].line-input{display:none}.print-date{display:block}.branch-select{display:none!important}.branch-print{display:block!important}}
     @page{size:A4;margin:0}
     @media print{html,body{width:210mm;height:297mm;background:#fff;padding:0}.app-view .sheet,.sheet{width:210mm;height:297mm;min-height:297mm;padding:9mm 10mm;margin:0;border-radius:0;box-shadow:none;break-after:page;overflow:hidden}.line-input,.amount-input{border-bottom-color:#56647c}select{-webkit-appearance:none;appearance:none;background:none!important;padding-left:1mm!important;padding-right:1mm!important}.phone-code-reset{display:none!important}.phone-entry.other-code-selected .phone-custom-code{flex-basis:32mm;width:32mm}input[type=date].line-input::-webkit-calendar-picker-indicator{display:none}.phone-code,.phone-number,.phone-custom-code{border-bottom-color:#56647c}input,textarea,select{-webkit-print-color-adjust:exact;print-color-adjust:exact}.entry-workspace{display:none!important}#service-order-template{display:block!important}.language-toggle{display:none!important}}
+
+    .cloud-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .cloud-admin-block{border:1px solid #d4dbe6;border-radius:10px;padding:14px;background:#fff}
+    .cloud-admin-block h3{margin:0 0 10px;color:var(--navy)}
+    .cloud-admin-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .cloud-admin-form .wide{grid-column:1/-1}
+    .cloud-admin-list{display:grid;gap:8px;margin-top:10px}
+    .cloud-admin-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid #dbe1ea;border-radius:8px;padding:10px}
+    .cloud-admin-meta{font-size:12px;color:#536178;margin-top:4px;direction:ltr;text-align:start;overflow-wrap:anywhere}
+    .cloud-admin-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .cloud-mfa-box{margin-bottom:14px;border:1px solid #e2bd48;background:#fff9df;border-radius:10px;padding:12px}
+    .cloud-mfa-setup{display:grid;justify-items:start;gap:9px}
+    .cloud-mfa-qr{width:180px;height:180px;background:#fff;border:8px solid #fff}
+    .cloud-mfa-secret{direction:ltr;unicode-bidi:isolate;font-family:Consolas,monospace;overflow-wrap:anywhere}
+    @media(max-width:850px){.cloud-admin-grid{grid-template-columns:1fr}.cloud-admin-form{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -236,8 +260,20 @@
       <button class="nav-button" type="button" data-view="history" data-ar="الأوامر السابقة" data-en="Order History">الأوامر السابقة</button>
       <button class="nav-button" type="button" data-view="settings" data-ar="الإعدادات" data-en="Settings">الإعدادات</button>
     </nav>
+    <span id="cloud-session-badge" class="cloud-session-badge" hidden></span>
+    <button id="cloud-logout" class="language-toggle cloud-logout" type="button" data-ar="تسجيل الخروج" data-en="Sign out" hidden>تسجيل الخروج</button>
     <button id="language-toggle" class="language-toggle" type="button" aria-label="تغيير اللغة">English</button>
   </header>
+  <div id="cloud-auth-gate" class="auth-gate" hidden>
+    <form id="cloud-auth-form" class="auth-card" autocomplete="on">
+      <h2 data-ar="تسجيل الدخول إلى النظام الموحد" data-en="Sign in to the unified system">تسجيل الدخول إلى النظام الموحد</h2>
+      <p data-ar="استخدم الحساب الذي أنشأه مدير النظام. لا تحفظ كلمة المرور في المتصفح." data-en="Use the account created by the system administrator. Do not save the password in the browser.">استخدم الحساب الذي أنشأه مدير النظام. لا تحفظ كلمة المرور في المتصفح.</p>
+      <label class="auth-field"><span data-ar="البريد الوظيفي" data-en="Work email">البريد الوظيفي</span><input id="cloud-auth-email" type="email" autocomplete="username" required></label>
+      <label class="auth-field"><span data-ar="كلمة المرور" data-en="Password">كلمة المرور</span><input id="cloud-auth-password" type="password" autocomplete="current-password" required></label>
+      <button id="cloud-auth-submit" class="auth-submit" type="submit" data-ar="دخول آمن" data-en="Secure sign in">دخول آمن</button>
+      <p id="cloud-auth-message" class="auth-message" role="status" aria-live="polite"></p>
+    </form>
+  </div>
   <section id="view-new" class="app-view active">
   <aside id="sender-panel" class="sender-panel" data-state="starting" aria-live="polite">
     <div class="sender-status"><span class="status-dot" aria-hidden="true"></span><span id="sender-status-text">جاري تشغيل مرسل واتساب…</span></div>
@@ -427,6 +463,45 @@
 
   <section id="view-settings" class="app-view">
     <div class="workspace-card">
+
+      <section id="cloud-admin-section" class="settings-section" hidden>
+        <div class="settings-section-head"><button id="cloud-admin-toggle" class="error-log-toggle" type="button" aria-expanded="false" aria-controls="cloud-admin-panel"><span class="error-log-arrow" aria-hidden="true">▶</span><span data-ar="إدارة النظام المركزي" data-en="Central system administration">إدارة النظام المركزي</span></button></div>
+        <div id="cloud-admin-panel" class="error-log-panel" hidden>
+          <div id="cloud-mfa-box" class="cloud-mfa-box">
+            <strong data-ar="التحقق الثنائي مطلوب لإدارة النظام" data-en="Multi-factor authentication is required for administration">التحقق الثنائي مطلوب لإدارة النظام</strong>
+            <p data-ar="اربط تطبيق المصادقة ثم أدخل الرمز المكوّن من 6 أرقام." data-en="Link an authenticator app, then enter its 6-digit code.">اربط تطبيق المصادقة ثم أدخل الرمز المكوّن من 6 أرقام.</p>
+            <button id="cloud-mfa-prepare" class="ui-button" type="button" data-ar="إعداد أو تحقق الآن" data-en="Set up or verify now">إعداد أو تحقق الآن</button>
+            <div id="cloud-mfa-setup" class="cloud-mfa-setup" hidden>
+              <img id="cloud-mfa-qr" class="cloud-mfa-qr" alt="TOTP QR code" hidden>
+              <code id="cloud-mfa-secret" class="cloud-mfa-secret"></code>
+              <input id="cloud-mfa-factor-id" type="hidden">
+              <div class="ui-field"><label for="cloud-mfa-code" data-ar="رمز التحقق" data-en="Verification code">رمز التحقق</label><input id="cloud-mfa-code" class="ui-input" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+              <button id="cloud-mfa-verify" class="ui-button" type="button" data-ar="تحقق" data-en="Verify">تحقق</button>
+            </div>
+          </div>
+          <div id="cloud-admin-online" class="cloud-admin-grid" hidden>
+            <div class="cloud-admin-block">
+              <h3 data-ar="الأجهزة" data-en="Devices">الأجهزة</h3>
+              <button id="cloud-admin-refresh" class="ui-button small" type="button" data-ar="تحديث" data-en="Refresh">تحديث</button>
+              <div id="cloud-device-list" class="cloud-admin-list"></div>
+            </div>
+            <div class="cloud-admin-block">
+              <h3 data-ar="إنشاء مستخدم" data-en="Create user">إنشاء مستخدم</h3>
+              <form id="cloud-user-form" class="cloud-admin-form" autocomplete="off">
+                <div class="ui-field"><label for="cloud-user-email" data-ar="البريد الوظيفي" data-en="Work email">البريد الوظيفي</label><input id="cloud-user-email" class="ui-input" type="email" required></div>
+                <div class="ui-field"><label for="cloud-user-username" data-ar="المعرف" data-en="Username">المعرف</label><input id="cloud-user-username" class="ui-input" pattern="[A-Za-z0-9._-]{3,64}" required></div>
+                <div class="ui-field"><label for="cloud-user-name" data-ar="الاسم" data-en="Display name">الاسم</label><input id="cloud-user-name" class="ui-input" required></div>
+                <div class="ui-field"><label for="cloud-user-password" data-ar="كلمة مرور مؤقتة" data-en="Temporary password">كلمة مرور مؤقتة</label><input id="cloud-user-password" class="ui-input" type="password" minlength="12" required></div>
+                <div class="ui-field wide"><label for="cloud-user-branches" data-ar="الفروع" data-en="Branches">الفروع</label><select id="cloud-user-branches" class="ui-input" multiple required></select></div>
+                <div class="ui-field"><label for="cloud-user-role" data-ar="الدور في الفروع" data-en="Branch role">الدور في الفروع</label><select id="cloud-user-role" class="ui-input"><option value="employee" data-ar="موظف" data-en="Employee">موظف</option><option value="supervisor" data-ar="مشرف" data-en="Supervisor">مشرف</option></select></div>
+                <button class="ui-button" type="submit" data-ar="إنشاء المستخدم" data-en="Create user">إنشاء المستخدم</button>
+              </form>
+              <h3 data-ar="المستخدمون" data-en="Users">المستخدمون</h3>
+              <div id="cloud-user-list" class="cloud-admin-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
       <section class="settings-section">
       <div class="settings-section-head"><button id="branches-toggle" class="error-log-toggle" type="button" aria-expanded="false" aria-controls="branches-panel"><span class="error-log-arrow" aria-hidden="true">▶</span><span data-ar="الفروع وأرقام التواصل" data-en="Branches and contact numbers">الفروع وأرقام التواصل</span></button></div>
       <div id="branches-panel" class="error-log-panel" hidden>
@@ -435,6 +510,7 @@
       <form id="branch-form" class="branch-editor" autocomplete="off" hidden>
         <input id="branch-id" type="hidden">
         <div class="ui-field"><label for="branch-name-setting" data-ar="اسم الفرع" data-en="Branch name">اسم الفرع</label><input id="branch-name-setting" class="ui-input" maxlength="120" required></div>
+        <div id="branch-business-code-field" class="ui-field" hidden><label for="branch-business-code" data-ar="رمز الفرع" data-en="Branch code">رمز الفرع</label><input id="branch-business-code" class="ui-input" maxlength="20" pattern="[A-Za-z0-9_-]{2,20}" placeholder="RYD01"></div>
         <div class="ui-field"><label for="branch-code-setting" data-ar="مفتاح الدولة" data-en="Country code">مفتاح الدولة</label><select id="branch-code-setting" class="ui-input"><option value="+966">السعودية +966</option><option value="+971">الإمارات +971</option><option value="+965">الكويت +965</option><option value="+973">البحرين +973</option><option value="+974">قطر +974</option><option value="+968">عُمان +968</option></select></div>
         <div class="ui-field"><label for="branch-phone-setting" data-ar="رقم الجوال" data-en="Mobile number">رقم الجوال</label><input id="branch-phone-setting" class="ui-input" type="tel" inputmode="numeric" maxlength="9" placeholder="5XXXXXXXX" required><small id="branch-mobile-hint" class="phone-validation-hint" aria-live="polite"></small></div>
         <button id="branch-save" class="ui-button" type="submit" data-ar="حفظ الفرع" data-en="Save branch">حفظ الفرع</button>
@@ -674,8 +750,8 @@
       branchMobileInput.setCustomValidity(branch && branch.configured ? '' : uiText('اختر فرعًا مكتمل البيانات من الإعدادات.','Select a branch with a configured mobile number.'));
     }
     function selectedBranch(){
-      const id = Number(branchSelect.value);
-      return branchRecords.find(function(branch){ return Number(branch.id) === id; }) || null;
+      const id = String(branchSelect.value || '');
+      return branchRecords.find(function(branch){ return String(branch.id) === id; }) || null;
     }
     function splitInternationalPhone(value){
       const phone = String(value || '');
@@ -1050,40 +1126,86 @@
     updateRemainingAmount();
 
     async function requestNextOrderNumber(){
+      if (cloudMode){
+        orderNumberInput.value = activeCloudOrder ? activeCloudOrder.orderNumber : '';
+        return orderNumberInput.value;
+      }
       const result = await localApi('/api/order-number/next',{method:'POST'});
       orderNumberInput.value = result.orderNumber;
       return result.orderNumber;
     }
     async function ensureCurrentOrderNumber(){
+      if (cloudMode) return orderNumberInput.value;
       if (!orderNumberInput.value) return requestNextOrderNumber();
       await localApi('/api/order-number/ensure',{method:'POST',json:{orderNumber:orderNumberInput.value}});
       return orderNumberInput.value;
     }
     async function advanceOrderNumber(){
-      await requestNextOrderNumber();
+      if (!cloudMode) await requestNextOrderNumber();
       saveDraft();
     }
     function collectDraftFields(){
       const fields = {};
       serviceForm.querySelectorAll('input[id],select[id],textarea[id]').forEach(function(control){
-        if (['vehicle-subservice','ppf-product','custom-choice-input','remaining-amount'].includes(control.id)) return;
+        if (['vehicle-subservice','ppf-product','custom-choice-input','remaining-amount','service-order-number'].includes(control.id)) return;
         fields[control.id] = control.value;
       });
       serviceForm.querySelectorAll('input[type=radio]:checked').forEach(function(control){ fields['radio:' + control.name] = control.value; });
       return fields;
     }
+    function storedDraft(){
+      return {
+        orderNumber:cloudMode ? '' : orderNumberInput.value,
+        fields:collectDraftFields(),
+        services:savedServices,
+        cloudOrder:cloudMode ? activeCloudOrder : null,
+        cloudDocumentReady:cloudMode ? activeCloudDocument : false,
+        cloudFinalizeCommandId:cloudMode ? cloudFinalizeCommandId : null,
+        cloudDocumentCommandId:cloudMode ? cloudDocumentCommandId : null
+      };
+    }
+    async function saveDraftNow(){
+      if (isRestoringDraft) return;
+      const draft = storedDraft();
+      if (cloudMode){
+        if (!senderToken || !cloudSession || !cloudSession.authenticated) return;
+        await localApi('/api/cloud/draft',{method:'PUT',json:{draft:draft}});
+      } else {
+        localStorage.setItem(draftStorageKey, JSON.stringify(draft));
+      }
+    }
     function saveDraft(){
       if (isRestoringDraft) return;
-      const draft = {orderNumber:orderNumberInput.value,fields:collectDraftFields(),services:savedServices};
-      localStorage.setItem(draftStorageKey, JSON.stringify(draft));
+      if (!cloudMode){
+        localStorage.setItem(draftStorageKey, JSON.stringify(storedDraft()));
+        return;
+      }
+      clearTimeout(cloudDraftTimer);
+      cloudDraftTimer = setTimeout(function(){
+        saveDraftNow().catch(function(){ showToast(uiText('تعذر حفظ المسودة المشفرة.','Could not save the encrypted draft.'),true); });
+      },500);
     }
     async function restoreDraft(){
-      const raw = localStorage.getItem(draftStorageKey);
-      if (!raw){ await requestNextOrderNumber(); return; }
+      let draft = null;
       try{
-        const draft = JSON.parse(raw);
+        if (cloudMode){
+          const result = await localApi('/api/cloud/draft');
+          draft = result.draft;
+          orderNumberInput.value = '';
+        } else {
+          const raw = localStorage.getItem(draftStorageKey);
+          if (raw) draft = JSON.parse(raw);
+        }
+        if (!draft){
+          await requestNextOrderNumber();
+          return;
+        }
         isRestoringDraft = true;
-        orderNumberInput.value = draft.orderNumber || '';
+        activeCloudOrder = cloudMode && draft.cloudOrder ? draft.cloudOrder : null;
+        activeCloudDocument = Boolean(cloudMode && draft.cloudDocumentReady);
+        cloudFinalizeCommandId = cloudMode ? (draft.cloudFinalizeCommandId || null) : null;
+        cloudDocumentCommandId = cloudMode ? (draft.cloudDocumentCommandId || null) : null;
+        orderNumberInput.value = cloudMode && activeCloudOrder ? activeCloudOrder.orderNumber : (draft.orderNumber || '');
         await ensureCurrentOrderNumber();
         const fields = draft.fields || {};
         Object.keys(fields).forEach(function(key){
@@ -1113,7 +1235,8 @@
         validateCustomerMobile();
         validatePlate();
       } catch(error){
-        localStorage.removeItem(draftStorageKey);
+        if (cloudMode) await localApi('/api/cloud/draft',{method:'DELETE'}).catch(function(){});
+        else localStorage.removeItem(draftStorageKey);
         await requestNextOrderNumber();
       } finally {
         isRestoringDraft = false;
@@ -1166,9 +1289,35 @@
     document.getElementById('print-form').addEventListener('click', async function(){
       if (!validateForPrint()) return;
       const printButton = this;
+      let action = null;
+      let printEffectStarted = false;
       printButton.disabled = true;
       try{
         applySelectedBranch();
+        if (cloudMode){
+          await saveDraftNow();
+          await ensureCloudFinalized();
+          showSendOverlay(uiText('جاري إنشاء وحفظ مستند الأمر…','Creating and securing the order document…'));
+          const pdfBlob = await createOrderPdf();
+          await ensureCloudDocument(pdfBlob);
+          hideSendOverlay();
+          const actionId = crypto.randomUUID();
+          action = await recordCloudAction(actionId,'queued',0,{});
+          action = await recordCloudAction(actionId,'in_progress',action.version,{});
+          syncPrintTemplate();
+          printEffectStarted = true;
+          window.print();
+          const confirmed = confirm(uiText('هل تمت طباعة أمر الخدمة أو حفظه بصيغة PDF؟','Was the service order printed or saved as a PDF?'));
+          action = await recordCloudAction(actionId,confirmed ? 'succeeded' : 'uncertain',action.version,{confirmedByUser:confirmed});
+          if (!confirmed){
+            showToast(uiText('سُجلت محاولة الطباعة كغير مؤكدة لتراجعها الإدارة.','The print attempt was recorded as uncertain for review.'),true);
+            return;
+          }
+          await resetOrderForm(true);
+          showToast(uiText('تم اعتماد أمر الخدمة وطباعته وفتح مسودة جديدة.','The service order was finalized and printed. A new draft is open.'));
+          return;
+        }
+
         syncPrintTemplate();
         saveDraft();
         window.print();
@@ -1177,9 +1326,16 @@
         await resetOrderForm(true,nextOrderNumber);
         showToast(uiText('تم اعتماد أمر الخدمة وفتح أمر جديد برقم جديد.','The service order was approved and a new order number is now open.'));
       } catch(error){
-        showToast(uiText('تم فتح الطباعة، لكن تعذر تجهيز رقم أمر الخدمة التالي. أعد تشغيل البرنامج قبل إنشاء طلب آخر.','Printing was opened, but the next order number could not be prepared. Restart the app before creating another order.'),true);
+        if (cloudMode && action && action.status === 'in_progress'){
+          try{
+            await recordCloudAction(action.actionId,printEffectStarted ? 'uncertain' : 'failed_before_effect',action.version,{failureCode:error.code || 'PRINT_FAILED'});
+          }catch(recoveryError){}
+        }
+        showToast(error.message || uiText('تعذر اعتماد أمر الخدمة للطباعة.','Could not finalize the service order for printing.'),true);
       } finally {
+        hideSendOverlay();
         printButton.disabled = false;
+        updateSendButtonState();
       }
     });
     function hasMeaningfulOrderData(){
@@ -1193,7 +1349,18 @@
     async function resetOrderForm(advanceNumber, preparedNumber){
       const currentNumber = orderNumberInput.value;
       const retainedBranch = branchSelect.value;
-      localStorage.removeItem(draftStorageKey);
+      clearTimeout(cloudDraftTimer);
+      if (cloudMode){
+        await localApi('/api/cloud/draft',{method:'DELETE'}).catch(function(){});
+        if (advanceNumber){
+          activeCloudOrder = null;
+          activeCloudDocument = false;
+          cloudFinalizeCommandId = null;
+          cloudDocumentCommandId = null;
+        }
+      } else {
+        localStorage.removeItem(draftStorageKey);
+      }
       serviceForm.reset();
       serviceForm.classList.remove('validation-attempted');
       serviceForm.querySelectorAll('.field-error').forEach(function(field){ field.classList.remove('field-error'); });
@@ -1222,6 +1389,7 @@
       saveDraft();
     }
     async function advancePastAlreadySavedDraft(){
+      if (cloudMode) return false;
       const currentOrder = orderNumberInput.value;
       if (!currentOrder || !senderToken) return false;
       try{
@@ -1253,10 +1421,22 @@
     let qrModalDismissed = false;
     let toastTimer = null;
     let applicationInitialized = false;
+    let cloudMode = false;
+    let cloudSession = null;
+    let activeCloudOrder = null;
+    let activeCloudDocument = false;
+    let cloudFinalizeCommandId = null;
+    let cloudDocumentCommandId = null;
+    let cloudDraftTimer = null;
+    let cloudPollTimer = null;
+    let cloudAdminLoaded = false;
+    let cloudAdminLoading = false;
 
     function updateSendButtonState(){
       const branch = selectedBranch();
-      sendWhatsAppButton.disabled = !senderReady || !branch || !branch.configured;
+      const cloudWriteAllowed = !cloudMode || Boolean(cloudSession && cloudSession.canFinalize);
+      sendWhatsAppButton.disabled = !senderReady || !branch || !branch.configured || !cloudWriteAllowed;
+      document.getElementById('print-form').disabled = cloudMode && !cloudWriteAllowed;
     }
 
     const senderStateLabels = {
@@ -1299,6 +1479,313 @@
       }
       return result;
     }
+
+    function showCloudAuthGate(message){
+      const gate = document.getElementById('cloud-auth-gate');
+      gate.hidden = false;
+      document.getElementById('cloud-auth-message').textContent = message || '';
+      document.getElementById('cloud-auth-password').value = '';
+      document.getElementById('cloud-auth-email').focus();
+    }
+
+    function applyCloudSession(status){
+      cloudSession = status || null;
+      const usable = Boolean(status && status.authenticated && status.deviceState === 'approved' && status.mode !== 'locked');
+      document.getElementById('cloud-auth-gate').hidden = usable;
+      const badge = document.getElementById('cloud-session-badge');
+      const logout = document.getElementById('cloud-logout');
+      badge.hidden = !status || !status.authenticated;
+      logout.hidden = !status || !status.authenticated;
+      badge.textContent = status && status.authenticated
+        ? (status.displayName || status.username || '') + (status.mode === 'offline' ? uiText(' - دون اتصال',' - offline') : '')
+        : '';
+      const isSystemAdmin = Boolean(status && status.systemAdmin);
+      const canManageCloud = Boolean(isSystemAdmin && status.mfaVerified && status.mode === 'online');
+      document.getElementById('branch-business-code-field').hidden = !cloudMode;
+      document.getElementById('branches-toggle').hidden = cloudMode && !canManageCloud;
+      document.querySelector('.branch-toolbar').hidden = cloudMode && !canManageCloud;
+      if (cloudMode && !canManageCloud) document.getElementById('branch-form').hidden = true;
+      document.getElementById('cloud-admin-section').hidden = !cloudMode || !isSystemAdmin;
+      document.getElementById('cloud-mfa-box').hidden = !isSystemAdmin || Boolean(status.mfaVerified);
+      document.getElementById('cloud-admin-online').hidden = !canManageCloud;
+      if (canManageCloud && !cloudAdminLoaded) setTimeout(function(){ loadCloudAdministration(false); },0);
+      if (typeof renderBranchList === 'function' && allBranchRecords.length) renderBranchList();
+      updateSendButtonState();
+      return usable;
+    }
+
+    async function refreshCloudSession(){
+      if (!cloudMode) return true;
+      try{
+        const status = await localApi('/api/cloud/auth/status');
+        if (!applyCloudSession(status)){
+          const message = status.deviceState === 'pending'
+            ? uiText('هذا الجهاز بانتظار اعتماد مدير النظام.','This device is waiting for administrator approval.')
+            : status.deviceState === 'revoked'
+              ? uiText('تم إلغاء اعتماد هذا الجهاز.','This device approval was revoked.')
+              : status.mode === 'locked'
+                ? uiText('انتهت مهلة العمل دون اتصال. اتصل بالشبكة للتحقق.','Offline access expired. Connect to the network to verify.')
+                : '';
+          showCloudAuthGate(message);
+          return false;
+        }
+        return true;
+      } catch(error){
+        applyCloudSession(null);
+        showCloudAuthGate(uiText('تعذر التحقق من الجلسة الآن.','The session could not be verified.'));
+        return false;
+      }
+    }
+
+    document.getElementById('cloud-auth-form').addEventListener('submit',async function(event){
+      event.preventDefault();
+      const button = document.getElementById('cloud-auth-submit');
+      button.disabled = true;
+      document.getElementById('cloud-auth-message').textContent = '';
+      try{
+        const status = await localApi('/api/cloud/auth/login',{
+          method:'POST',
+          json:{
+            email:document.getElementById('cloud-auth-email').value.trim(),
+            password:document.getElementById('cloud-auth-password').value
+          }
+        });
+        if (applyCloudSession(status)){
+          await initializeWorkspace();
+        } else {
+          showCloudAuthGate(uiText('تم تسجيل الدخول، والجهاز بانتظار اعتماد المدير.','Signed in. This device is waiting for administrator approval.'));
+        }
+      } catch(error){
+        showCloudAuthGate(error.code === 'LOGIN_RATE_LIMITED'
+          ? uiText('محاولات كثيرة. انتظر خمس دقائق.','Too many attempts. Wait five minutes.')
+          : uiText('بيانات الدخول غير صحيحة أو الحساب غير متاح.','The credentials are invalid or the account is unavailable.'));
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById('cloud-logout').addEventListener('click',async function(){
+      try{ await localApi('/api/cloud/auth/logout',{method:'POST'}); }catch(error){}
+      window.location.reload();
+    });
+
+    function scheduleCloudPoll(){
+      clearTimeout(cloudPollTimer);
+      if (!cloudMode || !cloudSession || !cloudSession.authenticated) return;
+      cloudPollTimer = setTimeout(async function(){
+        try{
+          if (await refreshCloudSession() && cloudSession.mode === 'online'){
+            await localApi('/api/cloud/sync',{method:'POST',json:{limit:100}});
+          }
+        }catch(error){}
+        scheduleCloudPoll();
+      }, document.hidden ? 300000 : 60000);
+    }
+    document.addEventListener('visibilitychange',scheduleCloudPoll);
+
+    function updateCloudAdminBranchOptions(){
+      const select = document.getElementById('cloud-user-branches');
+      if (!select) return;
+      const selected = new Set(Array.from(select.selectedOptions).map(function(option){ return option.value; }));
+      select.innerHTML = '';
+      allBranchRecords.filter(function(branch){ return branch.active; }).forEach(function(branch){
+        const option = new Option((branch.code ? branch.code + ' — ' : '') + branch.name,String(branch.id));
+        option.selected = selected.has(String(branch.id));
+        select.appendChild(option);
+      });
+    }
+
+    function renderCloudDevices(devices){
+      const host = document.getElementById('cloud-device-list');
+      if (!host) return;
+      if (!devices.length){
+        host.innerHTML = '<div class="empty-state">' + uiText('لا توجد أجهزة مسجلة.','No registered devices.') + '</div>';
+        return;
+      }
+      host.innerHTML = devices.map(function(device){
+        const action = device.state === 'pending'
+          ? '<button class="ui-button small cloud-device-action" type="button" data-action="approve" data-device-id="' + escapeHtml(device.id) + '">' + uiText('اعتماد','Approve') + '</button>'
+          : device.state === 'approved'
+            ? '<button class="ui-button small danger cloud-device-action" type="button" data-action="revoke" data-device-id="' + escapeHtml(device.id) + '">' + uiText('إلغاء الاعتماد','Revoke') + '</button>'
+            : '';
+        return '<div class="cloud-admin-row"><div><strong>' + escapeHtml(device.machineLabel) + '</strong><div>' +
+          escapeHtml(device.ownerDisplayName || device.ownerUsername || '') + ' — ' + escapeHtml(device.state) +
+          '</div><div class="cloud-admin-meta">' + escapeHtml(device.id) + '</div></div><div class="cloud-admin-actions">' + action + '</div></div>';
+      }).join('');
+    }
+
+    function renderCloudUsers(users){
+      const host = document.getElementById('cloud-user-list');
+      if (!host) return;
+      if (!users.length){
+        host.innerHTML = '<div class="empty-state">' + uiText('لا يوجد مستخدمون.','No users.') + '</div>';
+        return;
+      }
+      host.innerHTML = users.map(function(user){
+        const current = cloudSession && user.userId === cloudSession.userId;
+        const memberships = (user.memberships || []).filter(function(item){ return item.active; }).map(function(item){
+          return (item.branchCode || item.branchName) + ' (' + item.role + ')';
+        }).join('، ');
+        const toggle = current ? '' : '<button class="ui-button small ' + (user.active ? 'danger' : '') +
+          ' cloud-user-action" type="button" data-action="' + (user.active ? 'disable' : 'enable') +
+          '" data-user-id="' + escapeHtml(user.userId) + '">' + (user.active ? uiText('تعطيل','Disable') : uiText('تفعيل','Enable')) + '</button>';
+        const revoke = current ? '' : '<button class="ui-button small secondary cloud-user-action" type="button" data-action="revoke-sessions" data-user-id="' +
+          escapeHtml(user.userId) + '">' + uiText('سحب الجلسات','Revoke sessions') + '</button>';
+        const publisher = '<button class="ui-button small secondary cloud-user-action" type="button" data-action="release-publisher" data-active="' +
+          String(!user.releasePublisher) + '" data-user-id="' + escapeHtml(user.userId) + '">' +
+          (user.releasePublisher ? uiText('إلغاء ناشر الإصدار','Remove publisher') : uiText('تعيين ناشر إصدار','Make publisher')) + '</button>';
+        return '<div class="cloud-admin-row"><div><strong>' + escapeHtml(user.displayName) + '</strong><div>' +
+          escapeHtml(user.username) + (user.systemAdmin ? ' — ' + uiText('مدير نظام','System admin') : '') +
+          '</div><div class="cloud-admin-meta">' + escapeHtml(memberships || uiText('دون فروع','No branches')) +
+          '</div></div><div class="cloud-admin-actions">' + toggle + revoke + publisher + '</div></div>';
+      }).join('');
+    }
+    async function loadCloudAdministration(force){
+      if (!cloudMode || !cloudSession || !cloudSession.systemAdmin || !cloudSession.mfaVerified || cloudSession.mode !== 'online') return;
+      if (cloudAdminLoading || (cloudAdminLoaded && !force)) return;
+      cloudAdminLoading = true;
+      try{
+        const results = await Promise.all([
+          localApi('/api/cloud/admin/devices'),
+          localApi('/api/cloud/admin/users')
+        ]);
+        renderCloudDevices(results[0].devices || []);
+        renderCloudUsers(results[1].users || []);
+        updateCloudAdminBranchOptions();
+        cloudAdminLoaded = true;
+      }catch(error){
+        showToast(uiText('تعذر تحميل لوحة الإدارة.','Could not load the administration panel.'),true);
+      }finally{
+        cloudAdminLoading = false;
+      }
+    }
+
+    document.getElementById('cloud-admin-refresh').addEventListener('click',function(){
+      cloudAdminLoaded = false;
+      loadCloudAdministration(true);
+    });
+
+    document.getElementById('cloud-mfa-prepare').addEventListener('click',async function(){
+      const button = this;
+      button.disabled = true;
+      try{
+        const factors = await localApi('/api/cloud/auth/mfa');
+        const verified = (factors.all || []).find(function(factor){ return factor.type === 'totp' && factor.status === 'verified'; });
+        let factorId = verified && verified.id;
+        const setup = document.getElementById('cloud-mfa-setup');
+        const qr = document.getElementById('cloud-mfa-qr');
+        const secret = document.getElementById('cloud-mfa-secret');
+        if (!factorId){
+          const result = await localApi('/api/cloud/auth/mfa/enroll',{method:'POST',json:{friendlyName:'Blue Shark administrator'}});
+          factorId = result.enrollment.factorId;
+          qr.src = result.enrollment.qrCode;
+          qr.hidden = false;
+          secret.textContent = result.enrollment.secret;
+        }else{
+          qr.hidden = true;
+          qr.removeAttribute('src');
+          secret.textContent = uiText('استخدم عامل المصادقة المسجل.','Use the enrolled authenticator factor.');
+        }
+        document.getElementById('cloud-mfa-factor-id').value = factorId;
+        document.getElementById('cloud-mfa-code').value = '';
+        setup.hidden = false;
+        document.getElementById('cloud-mfa-code').focus();
+      }catch(error){
+        showToast(uiText('تعذر إعداد التحقق الثنائي.','Could not prepare multi-factor authentication.'),true);
+      }finally{
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById('cloud-mfa-verify').addEventListener('click',async function(){
+      const factorId = document.getElementById('cloud-mfa-factor-id').value;
+      const code = document.getElementById('cloud-mfa-code').value.replace(/\D/g,'');
+      if (!factorId || !/^\d{6}$/.test(code)){
+        showToast(uiText('أدخل رمز تحقق صحيحًا من 6 أرقام.','Enter a valid 6-digit verification code.'),true);
+        return;
+      }
+      try{
+        const status = await localApi('/api/cloud/auth/mfa/verify',{method:'POST',json:{factorId:factorId,code:code}});
+        applyCloudSession(status);
+        cloudAdminLoaded = false;
+        await loadCloudAdministration(true);
+        showToast(uiText('تم تفعيل التحقق الثنائي لهذه الجلسة.','Multi-factor authentication is active for this session.'));
+      }catch(error){
+        showToast(uiText('رمز التحقق غير صحيح أو انتهت صلاحيته.','The verification code is invalid or expired.'),true);
+      }
+    });
+
+    document.getElementById('cloud-device-list').addEventListener('click',async function(event){
+      const button = event.target.closest('.cloud-device-action');
+      if (!button) return;
+      const action = button.dataset.action;
+      let options = {method:'POST'};
+      if (action === 'revoke'){
+        const reason = prompt(uiText('اكتب سبب إلغاء اعتماد الجهاز.','Enter the reason for revoking this device.'));
+        if (!reason) return;
+        options = {method:'POST',json:{reason:reason}};
+      }
+      button.disabled = true;
+      try{
+        await localApi('/api/cloud/admin/devices/' + encodeURIComponent(button.dataset.deviceId) + '/' + action,options);
+        await loadCloudAdministration(true);
+      }catch(error){
+        showToast(uiText('تعذر تحديث اعتماد الجهاز.','Could not update device approval.'),true);
+      }finally{
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById('cloud-user-form').addEventListener('submit',async function(event){
+      event.preventDefault();
+      const branchIds = Array.from(document.getElementById('cloud-user-branches').selectedOptions).map(function(option){ return option.value; });
+      if (!branchIds.length){
+        showToast(uiText('اختر فرعًا واحدًا على الأقل.','Select at least one branch.'),true);
+        return;
+      }
+      const role = document.getElementById('cloud-user-role').value;
+      const request = {
+        action:'create',
+        email:document.getElementById('cloud-user-email').value.trim(),
+        username:document.getElementById('cloud-user-username').value.trim(),
+        displayName:document.getElementById('cloud-user-name').value.trim(),
+        temporaryPassword:document.getElementById('cloud-user-password').value,
+        assignments:branchIds.map(function(branchId){ return {branchId:branchId,role:role}; })
+      };
+      try{
+        await localApi('/api/cloud/admin/users',{method:'POST',json:request});
+        event.target.reset();
+        updateCloudAdminBranchOptions();
+        await loadCloudAdministration(true);
+        showToast(uiText('تم إنشاء المستخدم.','User created.'));
+      }catch(error){
+        showToast(uiText('تعذر إنشاء المستخدم. تحقق من البيانات والتكرار.','Could not create the user. Check the input and duplicates.'),true);
+      }
+    });
+
+    document.getElementById('cloud-user-list').addEventListener('click',async function(event){
+      const button = event.target.closest('.cloud-user-action');
+      if (!button) return;
+      const action = button.dataset.action;
+      button.disabled = true;
+      try{
+        if (action === 'revoke-sessions'){
+          const reason = prompt(uiText('اكتب سبب سحب الجلسات.','Enter the reason for revoking sessions.'));
+          if (!reason) return;
+          await localApi('/api/cloud/admin/users/' + encodeURIComponent(button.dataset.userId) + '/revoke-sessions',{method:'POST',json:{reason:reason}});
+        }else if (action === 'release-publisher'){
+          await localApi('/api/cloud/admin/users/' + encodeURIComponent(button.dataset.userId) + '/release-publisher',
+            {method:'POST',json:{active:button.dataset.active === 'true'}});
+        }else{
+          await localApi('/api/cloud/admin/users',{method:'POST',json:{action:action,userId:button.dataset.userId}});
+        }
+        await loadCloudAdministration(true);
+      }catch(error){
+        showToast(uiText('تعذر تحديث المستخدم.','Could not update the user.'),true);
+      }finally{
+        button.disabled = false;
+      }
+    });
 
     function escapeHtml(value){
       return String(value == null ? '' : value).replace(/[&<>"']/g,function(character){
@@ -1454,6 +1941,7 @@
       });
     }
     bindSettingsToggle('branches-toggle','branches-panel',loadBranches);
+    bindSettingsToggle('cloud-admin-toggle','cloud-admin-panel',function(){ loadCloudAdministration(true); });
     bindSettingsToggle('whatsapp-settings-toggle','whatsapp-settings-panel',refreshSenderStatus);
     bindSettingsToggle('backup-settings-toggle','backup-settings-panel',loadBackups);
     bindSettingsToggle('error-log-toggle','error-log-panel',loadErrorLogs);
@@ -1493,11 +1981,12 @@
     async function loadBranches(){
       if (!senderToken) return;
       try{
-        const result = await localApi('/api/branches?includeInactive=true');
+        const result = await localApi(cloudMode ? '/api/cloud/branches' : '/api/branches?includeInactive=true');
         allBranchRecords = result.branches || [];
         branchRecords = allBranchRecords.filter(function(branch){ return branch.active; });
         renderBranchOptions();
         renderBranchList();
+        updateCloudAdminBranchOptions();
         document.getElementById('branch-warning').classList.toggle('visible', branchRecords.some(function(branch){ return !branch.configured; }));
       } catch(error){
         showToast(uiText('تعذر تحميل إعدادات الفروع.','Could not load branch settings.'),true);
@@ -1506,6 +1995,7 @@
 
     function renderBranchList(){
       const container = document.getElementById('branch-list');
+      const canManage = !cloudMode || Boolean(cloudSession && cloudSession.systemAdmin && cloudSession.mfaVerified && cloudSession.mode === 'online');
       const activeBranches = allBranchRecords.filter(function(branch){ return branch.active; });
       if (!activeBranches.length){
         container.innerHTML = '<div class="empty-state">' + uiText('لا توجد فروع مضافة.','No branches added.') + '</div>';
@@ -1513,15 +2003,16 @@
       }
       container.innerHTML = activeBranches.map(function(branch){
         return '<div class="branch-row" data-branch-id="' + branch.id + '">' +
-          '<div><div class="branch-name">' + escapeHtml(branch.name) + '</div>' + (!branch.configured ? '<div class="branch-incomplete">' + uiText('مطلوب إضافة رقم الجوال','Mobile number required') + '</div>' : '') + '</div>' +
+          '<div><div class="branch-name">' + escapeHtml((cloudMode && branch.code ? branch.code + ' — ' : '') + branch.name) + '</div>' + (!branch.configured ? '<div class="branch-incomplete">' + uiText('مطلوب إضافة رقم الجوال','Mobile number required') + '</div>' : '') + '</div>' +
           '<div class="branch-phone-view">' + escapeHtml(branch.phone || uiText('بدون رقم','No number')) + '</div>' +
-          '<div class="row-actions"><button class="ui-button small branch-edit" type="button">' + uiText('تعديل','Edit') + '</button><button class="ui-button small danger branch-delete" type="button">' + uiText('حذف','Delete') + '</button></div>' +
+          (canManage ? '<div class="row-actions"><button class="ui-button small branch-edit" type="button">' + uiText('تعديل','Edit') + '</button><button class="ui-button small danger branch-delete" type="button">' + uiText('تعطيل','Deactivate') + '</button></div>' : '') +
         '</div>';
       }).join('');
     }
 
     function resetBranchEditor(closeEditor){
       document.getElementById('branch-id').value = '';
+      document.getElementById('branch-business-code').value = '';
       document.getElementById('branch-name-setting').value = '';
       document.getElementById('branch-code-setting').value = '+966';
       document.getElementById('branch-phone-setting').value = '';
@@ -1558,18 +2049,23 @@
     validateBranchSettingMobile();
     document.getElementById('branch-form').addEventListener('submit',async function(event){
       event.preventDefault();
-      const id = Number(document.getElementById('branch-id').value);
+      const id = document.getElementById('branch-id').value;
       const name = document.getElementById('branch-name-setting').value.trim();
+      const businessCode = document.getElementById('branch-business-code').value.trim().toUpperCase();
       const code = document.getElementById('branch-code-setting').value;
       const phoneInput = document.getElementById('branch-phone-setting');
       const rule = gccMobileRules[code];
       normalizeNationalNumber(phoneInput,code,rule ? rule.length : 15);
-      if (!name || !rule || !validateBranchSettingMobile()){
+      if (!name || !rule || !validateBranchSettingMobile() || (cloudMode && !/^[A-Z0-9_-]{2,20}$/.test(businessCode))){
         showToast(rule ? rule.message : uiText('أدخل رقم جوال صحيحًا.','Enter a valid mobile number.'),true);
         return;
       }
       try{
-        await localApi(id ? '/api/branches/' + id : '/api/branches',{method:id ? 'PUT' : 'POST',json:{name:name,phone:code + phoneInput.value}});
+        const request = cloudMode
+          ? {method:'POST',json:{branchId:id || null,code:businessCode,name:name,phone:code + phoneInput.value,active:true}}
+          : {method:id ? 'PUT' : 'POST',json:{name:name,phone:code + phoneInput.value}};
+        const endpoint = cloudMode ? '/api/cloud/admin/branches' : (id ? '/api/branches/' + id : '/api/branches');
+        await localApi(endpoint,request);
         resetBranchEditor();
         await loadBranches();
         showToast(id ? uiText('تم تحديث الفرع.','Branch updated.') : uiText('تمت إضافة الفرع.','Branch added.'));
@@ -1582,12 +2078,13 @@
     document.getElementById('branch-list').addEventListener('click',async function(event){
       const row = event.target.closest('.branch-row');
       if (!row) return;
-      const branch = allBranchRecords.find(function(item){ return Number(item.id) === Number(row.dataset.branchId); });
+      const branch = allBranchRecords.find(function(item){ return String(item.id) === String(row.dataset.branchId); });
       if (!branch) return;
       if (event.target.classList.contains('branch-edit')){
         const parts = splitInternationalPhone(branch.phone);
         document.getElementById('branch-id').value = branch.id;
         document.getElementById('branch-name-setting').value = branch.name;
+        document.getElementById('branch-business-code').value = branch.code || '';
         document.getElementById('branch-code-setting').value = parts.code === '+' ? '+966' : parts.code;
         document.getElementById('branch-phone-setting').value = parts.number;
         validateBranchSettingMobile();
@@ -1599,8 +2096,12 @@
       if (event.target.classList.contains('branch-delete')){
         if (!confirm(uiText('هل تريد حذف فرع "' + branch.name + '" من الطلبات الجديدة؟','Delete branch "' + branch.name + '" from new orders?'))) return;
         try{
-          await localApi('/api/branches/' + branch.id,{method:'DELETE'});
+          if (cloudMode){
+            await localApi('/api/cloud/admin/branches',{method:'POST',json:{branchId:branch.id,code:branch.code,name:branch.name,phone:branch.phone,active:false}});
+          } else {
+            await localApi('/api/branches/' + branch.id,{method:'DELETE'});
           await loadBranches();
+          }
           showToast(uiText('تم حذف الفرع مع الاحتفاظ به في الطلبات السابقة.','Branch deleted and retained in previous orders.'));
         } catch(error){
           showToast(error.code === 'LAST_BRANCH' ? uiText('يجب أن يبقى فرع واحد على الأقل.','At least one branch must remain.') : uiText('تعذر حذف الفرع.','Could not delete the branch.'),true);
@@ -1628,15 +2129,16 @@
       if (from) params.set('from',from);
       if (to) params.set('to',to);
       try{
-        const result = await localApi('/api/orders?' + params.toString());
+        const result = await localApi((cloudMode ? '/api/cloud/orders?' : '/api/orders?') + params.toString());
         const orders = result.orders || [];
         if (!orders.length){
           body.innerHTML = '<tr><td class="empty-state" colspan="8">' + uiText('لا توجد أوامر مطابقة.','No matching orders.') + '</td></tr>';
           return;
         }
         body.innerHTML = orders.map(function(order){
+          const identifier = cloudMode ? order.orderId : order.orderNumber;
           const fileStatus = order.pdfAvailable ? '<span class="status-pill">' + uiText('PDF متوفر','PDF available') + '</span>' : '<span class="status-pill missing">' + uiText('PDF مفقود','PDF missing') + '</span>';
-          return '<tr><td dir="ltr">' + escapeHtml(order.orderNumber) + '</td><td>' + escapeHtml(formatHistoryDate(order.sentAt)) + '</td><td>' + escapeHtml(order.customerName || uiText('بيانات قديمة غير متوفرة','Legacy data unavailable')) + '</td><td>' + escapeHtml(order.branchName || '-') + '</td><td>' + escapeHtml(order.vehicleModel || '-') + '</td><td>' + escapeHtml(formatAmount(order.totalAmount)) + '</td><td>' + fileStatus + '</td><td><button class="ui-button small history-detail-button" type="button" data-order-number="' + escapeHtml(order.orderNumber) + '">' + uiText('التفاصيل','Details') + '</button></td></tr>';
+          return '<tr><td dir="ltr">' + escapeHtml(order.orderNumber) + '</td><td>' + escapeHtml(formatHistoryDate(order.sentAt)) + '</td><td>' + escapeHtml(order.customerName || uiText('بيانات قديمة غير متوفرة','Legacy data unavailable')) + '</td><td>' + escapeHtml(order.branchName || '-') + '</td><td>' + escapeHtml(order.vehicleModel || '-') + '</td><td>' + escapeHtml(formatAmount(order.totalAmount)) + '</td><td>' + fileStatus + '</td><td><button class="ui-button small history-detail-button" type="button" data-order-number="' + escapeHtml(identifier) + '">' + uiText('التفاصيل','Details') + '</button></td></tr>';
         }).join('');
       } catch(error){
         body.innerHTML = '<tr><td class="empty-state" colspan="8">' + uiText('تعذر تحميل الأوامر السابقة.','Could not load order history.') + '</td></tr>';
@@ -1644,9 +2146,10 @@
     }
 
     let selectedHistoryOrder = null;
-    async function showHistoryOrder(orderNumber){
+    async function showHistoryOrder(identifier){
       try{
-        const result = await localApi('/api/orders/' + encodeURIComponent(orderNumber));
+        const endpoint = (cloudMode ? '/api/cloud/orders/' : '/api/orders/') + encodeURIComponent(identifier);
+        const result = await localApi(endpoint);
         const order = result.order;
         selectedHistoryOrder = order;
         const services = (order.services || []).map(function(service){
@@ -1678,7 +2181,11 @@
     document.getElementById('history-search').addEventListener('keydown',function(event){ if (event.key === 'Enter'){ event.preventDefault(); loadHistory(); } });
     document.getElementById('history-close').addEventListener('click',function(){ document.getElementById('history-modal').classList.remove('visible'); });
     document.getElementById('history-modal').addEventListener('click',function(event){ if (event.target === this) this.classList.remove('visible'); });
-    function historyPdfUrl(){ return selectedHistoryOrder ? '/api/orders/' + encodeURIComponent(selectedHistoryOrder.orderNumber) + '/pdf?token=' + encodeURIComponent(senderToken) : ''; }
+    function historyPdfUrl(){
+      if (!selectedHistoryOrder) return '';
+      const identifier = cloudMode ? selectedHistoryOrder.orderId : selectedHistoryOrder.orderNumber;
+      return (cloudMode ? '/api/cloud/orders/' : '/api/orders/') + encodeURIComponent(identifier) + '/pdf?token=' + encodeURIComponent(senderToken);
+    }
     document.getElementById('history-open-pdf').addEventListener('click',function(){ const url = historyPdfUrl(); if (url) window.open(url,'_blank','noopener'); });
     document.getElementById('history-print-pdf').addEventListener('click',function(){
       const url = historyPdfUrl();
@@ -1693,11 +2200,15 @@
       if (!confirm(uiText('سيتم إعادة إرسال أمر الخدمة ' + selectedHistoryOrder.orderNumber + ' إلى الرقم ' + phone + ' بنفس رقم الطلب وملف PDF المحفوظ. هل تريد المتابعة؟','Service order ' + selectedHistoryOrder.orderNumber + ' will be resent to ' + phone + ' using the same order number and saved PDF. Continue?'))) return;
       const resendButton = this;
       resendButton.disabled = true;
+      const historyIdentifier = cloudMode ? selectedHistoryOrder.orderId : selectedHistoryOrder.orderNumber;
       try{
         showSendOverlay(uiText('جاري إعادة إرسال أمر الخدمة عبر واتساب…','Resending the service order via WhatsApp…'));
-        await localApi('/api/orders/' + encodeURIComponent(selectedHistoryOrder.orderNumber) + '/resend',{method:'POST'});
+        const resendEndpoint = cloudMode
+          ? '/api/cloud/orders/' + encodeURIComponent(historyIdentifier) + '/send-whatsapp'
+          : '/api/orders/' + encodeURIComponent(historyIdentifier) + '/resend';
+        await localApi(resendEndpoint,cloudMode ? {method:'POST',json:{actionId:crypto.randomUUID()}} : {method:'POST'});
         await loadHistory();
-        await showHistoryOrder(selectedHistoryOrder.orderNumber);
+        await showHistoryOrder(historyIdentifier);
         showToast(uiText('تمت إعادة إرسال أمر الخدمة بنجاح دون إنشاء رقم جديد.','The service order was resent successfully without creating a new number.'));
       } catch(error){
         const messages = {
@@ -1765,21 +2276,34 @@
       }
     }
 
+    async function initializeWorkspace(){
+      if (applicationInitialized) return;
+      await loadBranches();
+      await restoreDraft();
+      if (!cloudMode) await advancePastAlreadySavedDraft();
+      saveDraft();
+      applicationInitialized = true;
+      if (!branchRecords.some(function(branch){ return branch.configured; })){
+        if (!cloudMode) showView('settings');
+        showToast(uiText('لا يوجد فرع متاح ومكتمل البيانات.','No available branch has complete settings.'),true);
+      }
+      scheduleCloudPoll();
+    }
+
     async function initializeSenderUi(){
       try{
         const response = await fetch('/api/config', {cache:'no-store'});
         const config = await response.json();
         if (!response.ok || !config.token) throw new Error('CONFIG_FAILED');
         senderToken = config.token;
+        cloudMode = Boolean(config.cloud && config.cloud.enabled);
         document.getElementById('app-version-value').textContent = config.appVersion || '—';
-        await loadBranches();
-        await restoreDraft();
-        await advancePastAlreadySavedDraft();
-        saveDraft();
-        applicationInitialized = true;
-        if (!branchRecords.some(function(branch){ return branch.configured; })){
-          showView('settings');
-          showToast(uiText('أضف رقم جوال لفرع واحد على الأقل للبدء.','Add a mobile number for at least one branch to begin.'),true);
+        document.getElementById('branches-toggle').hidden = cloudMode;
+        if (cloudMode){
+          localStorage.removeItem(draftStorageKey);
+          if (await refreshCloudSession()) await initializeWorkspace();
+        } else {
+          await initializeWorkspace();
         }
       } catch(error){
         showToast(uiText('تعذر الاتصال ببرنامج الإرسال المحلي.','Could not connect to the local sender.'), true);
@@ -1931,6 +2455,7 @@
       const branch = selectedBranch();
       return {
         branchId:branch ? branch.id : null,
+        branch:branch ? {id:branch.id,name:branch.name,phone:branch.phone} : null,
         customer:{name:document.getElementById('customer-name').value.trim(),phone:fullCustomerPhone()},
         dates:{reception:receptionDate.value,delivery:deliveryDate.value},
         vehicle:{
@@ -1946,7 +2471,78 @@
       };
     }
 
+    async function ensureCloudFinalized(){
+      if (!cloudMode) return null;
+      if (activeCloudOrder) return activeCloudOrder;
+      if (!cloudSession || !cloudSession.canFinalize){
+        throw new Error(uiText('يلزم اتصال صالح واعتماد الجهاز لإصدار الرقم.','An online approved session is required to issue the number.'));
+      }
+      const draft = buildOrderData();
+      cloudFinalizeCommandId = cloudFinalizeCommandId || crypto.randomUUID();
+      await saveDraftNow();
+      const result = await localApi('/api/cloud/orders/finalize',{
+        method:'POST',
+        json:{
+          commandId:cloudFinalizeCommandId,
+          branchId:draft.branchId,
+          draft:draft,
+          expectedVersion:0
+        }
+      });
+      activeCloudOrder = result.order;
+      orderNumberInput.value = activeCloudOrder.orderNumber;
+      await saveDraftNow();
+      return activeCloudOrder;
+    }
+
+    async function ensureCloudDocument(pdfBlob){
+      if (!cloudMode || activeCloudDocument) return;
+      const order = await ensureCloudFinalized();
+      cloudDocumentCommandId = cloudDocumentCommandId || crypto.randomUUID();
+      await saveDraftNow();
+      const formData = new FormData();
+      formData.append('pdf',pdfBlob,'Blue Shark.pdf');
+      formData.append('commandId',cloudDocumentCommandId);
+      const response = await fetch('/api/cloud/orders/' + encodeURIComponent(order.orderId) + '/document',{
+        method:'POST',
+        headers:{'X-Blue-Shark-Token':senderToken},
+        body:formData
+      });
+      let result = {};
+      try{ result = await response.json(); }catch(error){}
+      if (!response.ok){
+        const failure = new Error(result.code || 'DOCUMENT_UPLOAD_FAILED');
+        failure.code = result.code || 'DOCUMENT_UPLOAD_FAILED';
+        throw failure;
+      }
+      activeCloudDocument = true;
+      await saveDraftNow();
+    }
+
+    async function recordCloudAction(actionId,targetStatus,expectedVersion,receipt){
+      const result = await localApi('/api/cloud/orders/' + encodeURIComponent(activeCloudOrder.orderId) + '/actions',{
+        method:'POST',
+        json:{
+          commandId:crypto.randomUUID(),
+          actionId:actionId,
+          channel:'print',
+          targetStatus:targetStatus,
+          expectedVersion:expectedVersion,
+          receipt:receipt || {}
+        }
+      });
+      return result.action;
+    }
+
     async function postOrderPdf(pdfBlob, forceResend){
+      if (cloudMode){
+        const order = await ensureCloudFinalized();
+        await ensureCloudDocument(pdfBlob);
+        return localApi('/api/cloud/orders/' + encodeURIComponent(order.orderId) + '/send-whatsapp',{
+          method:'POST',
+          json:{actionId:crypto.randomUUID(),caption:buildWhatsAppCaption()}
+        });
+      }
       const formData = new FormData();
       formData.append('pdf', pdfBlob, 'Blue Shark.pdf');
       formData.append('orderNumber', orderNumberInput.value);
@@ -1982,7 +2578,12 @@
       if (!validateForPrint()) return;
       sendWhatsAppButton.disabled = true;
       try{
-        saveDraft();
+        if (cloudMode){
+          await saveDraftNow();
+          await ensureCloudFinalized();
+        } else {
+          saveDraft();
+        }
         showSendOverlay(uiText('جاري إنشاء PDF…','Creating PDF…'));
         const pdfBlob = await createOrderPdf();
         showSendOverlay(uiText('جاري إرسال PDF للعميل…','Sending PDF to the customer…'));
