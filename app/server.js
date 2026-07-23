@@ -57,7 +57,7 @@ const BACKUP_FORMAT_VERSION = 1;
 const CSRF_TOKEN = crypto.randomBytes(32).toString('hex');
 const WHATSAPP_DISABLED = process.env.BLUE_SHARK_DISABLE_WHATSAPP === '1';
 const FAKE_WHATSAPP = process.env.BLUE_SHARK_FAKE_WHATSAPP === '1';
-const KNOWN_GOOD_WWEB_VERSION = process.env.BLUE_SHARK_WWEB_VERSION || '2.3000.1043280533';
+const KNOWN_GOOD_WWEB_VERSION = process.env.BLUE_SHARK_WWEB_VERSION || '2.3000.1043735639';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(SENT_DIR, { recursive: true });
