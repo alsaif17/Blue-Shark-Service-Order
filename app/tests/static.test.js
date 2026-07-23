@@ -37,6 +37,14 @@ test('HTML validation patterns compile with the browser Unicode sets flag', () =
   assert.match(html, /\.auth-gate\[hidden\]\{display:none\}/);
 });
 
+test('new and restored orders always start with the current local reception date', () => {
+  assert.match(html, /function localToday\(\)/);
+  assert.match(html, /function applyCurrentOrderDates\(\)/);
+  assert.match(html, /receptionDate\.value = today/);
+  assert.match(html, /Object\.keys\(fields\)\.forEach[\s\S]*applyCurrentOrderDates\(\);[\s\S]*if \(fields\['vehicle-category'\]\)/);
+  assert.match(html, /deliveryDate\.value = '';[\s\S]*applyCurrentOrderDates\(\);/);
+});
+
 test('entry workspace remains separate from the hidden A4 template', () => {
   assert.match(html, /id="service-order-template"/);
   assert.match(html, /#service-order-template\{display:none!important\}/);

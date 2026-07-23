@@ -689,14 +689,20 @@
 
     const receptionDate = document.getElementById('reception-date');
     const deliveryDate = document.getElementById('delivery-date');
-    const now = new Date();
-    const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
-    receptionDate.min = today;
-    receptionDate.value = today;
-    deliveryDate.min = today;
-    deliveryDate.value = today;
+    function localToday(){
+      const now = new Date();
+      return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+    }
+    function applyCurrentOrderDates(){
+      const today = localToday();
+      receptionDate.min = today;
+      receptionDate.value = today;
+      deliveryDate.min = today;
+      if (!deliveryDate.value || deliveryDate.value < today) deliveryDate.value = today;
+    }
+    applyCurrentOrderDates();
     receptionDate.addEventListener('change', function(){
-      deliveryDate.min = receptionDate.value || today;
+      deliveryDate.min = receptionDate.value || localToday();
       if (!deliveryDate.value || deliveryDate.value < deliveryDate.min) deliveryDate.value = deliveryDate.min;
     });
 
@@ -1219,6 +1225,7 @@
             if (control && !['vehicle-category'].includes(key)) control.value = fields[key];
           }
         });
+        applyCurrentOrderDates();
         if (fields['vehicle-category']){
           vehicleCategory.value = fields['vehicle-category'];
           updateSubservices();
@@ -1368,10 +1375,8 @@
       orderNumberInput.value = advanceNumber ? '' : currentNumber;
       savedServices.splice(0, savedServices.length);
       currentDraft = null;
-      receptionDate.value = today;
-      deliveryDate.value = today;
-      receptionDate.min = today;
-      deliveryDate.min = today;
+      deliveryDate.value = '';
+      applyCurrentOrderDates();
       if (retainedBranch && branchSelect.querySelector('option[value="' + retainedBranch + '"]')) branchSelect.value = retainedBranch;
       applySelectedBranch();
       updateSubservices();
