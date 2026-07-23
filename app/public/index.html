@@ -199,6 +199,7 @@
     .cloud-session-badge{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 11px Arial,Tahoma,sans-serif;color:var(--navy)}
     .cloud-logout{border-color:#d8dee8;color:#8b1724}
     .auth-gate{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:20px;background:linear-gradient(145deg,#001a44f2,#073a6df2)}
+    .auth-gate[hidden]{display:none}
     .auth-card{width:min(420px,100%);box-sizing:border-box;background:#fff;border-radius:18px;padding:28px;box-shadow:0 24px 70px #0007;text-align:right}
     .auth-card h2{margin:0 0 8px;color:var(--navy)}.auth-card p{color:#526074;line-height:1.7}
     .auth-field{display:grid;gap:6px;margin:14px 0}.auth-field label{font-weight:800;color:var(--navy)}
@@ -487,9 +488,9 @@
             </div>
             <div class="cloud-admin-block">
               <h3 data-ar="إنشاء مستخدم" data-en="Create user">إنشاء مستخدم</h3>
-              <form id="cloud-user-form" class="cloud-admin-form" autocomplete="off">
+              <form id="cloud-user-form" class="cloud-admin-form" autocomplete="off" novalidate>
                 <div class="ui-field"><label for="cloud-user-email" data-ar="البريد الوظيفي" data-en="Work email">البريد الوظيفي</label><input id="cloud-user-email" class="ui-input" type="email" required></div>
-                <div class="ui-field"><label for="cloud-user-username" data-ar="المعرف" data-en="Username">المعرف</label><input id="cloud-user-username" class="ui-input" pattern="[A-Za-z0-9._-]{3,64}" required></div>
+                <div class="ui-field"><label for="cloud-user-username" data-ar="المعرف" data-en="Username">المعرف</label><input id="cloud-user-username" class="ui-input" pattern="[A-Za-z0-9._\-]{3,64}" required></div>
                 <div class="ui-field"><label for="cloud-user-name" data-ar="الاسم" data-en="Display name">الاسم</label><input id="cloud-user-name" class="ui-input" required></div>
                 <div class="ui-field"><label for="cloud-user-password" data-ar="كلمة مرور مؤقتة" data-en="Temporary password">كلمة مرور مؤقتة</label><input id="cloud-user-password" class="ui-input" type="password" minlength="12" required></div>
                 <div class="ui-field wide"><label for="cloud-user-branches" data-ar="الفروع" data-en="Branches">الفروع</label><select id="cloud-user-branches" class="ui-input" multiple required></select></div>
@@ -510,7 +511,7 @@
       <form id="branch-form" class="branch-editor" autocomplete="off" hidden>
         <input id="branch-id" type="hidden">
         <div class="ui-field"><label for="branch-name-setting" data-ar="اسم الفرع" data-en="Branch name">اسم الفرع</label><input id="branch-name-setting" class="ui-input" maxlength="120" required></div>
-        <div id="branch-business-code-field" class="ui-field" hidden><label for="branch-business-code" data-ar="رمز الفرع" data-en="Branch code">رمز الفرع</label><input id="branch-business-code" class="ui-input" maxlength="20" pattern="[A-Za-z0-9_-]{2,20}" placeholder="RYD01"></div>
+        <div id="branch-business-code-field" class="ui-field" hidden><label for="branch-business-code" data-ar="رمز الفرع" data-en="Branch code">رمز الفرع</label><input id="branch-business-code" class="ui-input" maxlength="20" pattern="[A-Za-z0-9_\-]{2,20}" placeholder="RYD01"></div>
         <div class="ui-field"><label for="branch-code-setting" data-ar="مفتاح الدولة" data-en="Country code">مفتاح الدولة</label><select id="branch-code-setting" class="ui-input"><option value="+966">السعودية +966</option><option value="+971">الإمارات +971</option><option value="+965">الكويت +965</option><option value="+973">البحرين +973</option><option value="+974">قطر +974</option><option value="+968">عُمان +968</option></select></div>
         <div class="ui-field"><label for="branch-phone-setting" data-ar="رقم الجوال" data-en="Mobile number">رقم الجوال</label><input id="branch-phone-setting" class="ui-input" type="tel" inputmode="numeric" maxlength="9" placeholder="5XXXXXXXX" required><small id="branch-mobile-hint" class="phone-validation-hint" aria-live="polite"></small></div>
         <button id="branch-save" class="ui-button" type="submit" data-ar="حفظ الفرع" data-en="Save branch">حفظ الفرع</button>
@@ -1500,13 +1501,13 @@
         ? (status.displayName || status.username || '') + (status.mode === 'offline' ? uiText(' - دون اتصال',' - offline') : '')
         : '';
       const isSystemAdmin = Boolean(status && status.systemAdmin);
-      const canManageCloud = Boolean(isSystemAdmin && status.mfaVerified && status.mode === 'online');
+      const canManageCloud = Boolean(isSystemAdmin && status.mode === 'online');
       document.getElementById('branch-business-code-field').hidden = !cloudMode;
       document.getElementById('branches-toggle').hidden = cloudMode && !canManageCloud;
       document.querySelector('.branch-toolbar').hidden = cloudMode && !canManageCloud;
       if (cloudMode && !canManageCloud) document.getElementById('branch-form').hidden = true;
       document.getElementById('cloud-admin-section').hidden = !cloudMode || !isSystemAdmin;
-      document.getElementById('cloud-mfa-box').hidden = !isSystemAdmin || Boolean(status.mfaVerified);
+      document.getElementById('cloud-mfa-box').hidden = true;
       document.getElementById('cloud-admin-online').hidden = !canManageCloud;
       if (canManageCloud && !cloudAdminLoaded) setTimeout(function(){ loadCloudAdministration(false); },0);
       if (typeof renderBranchList === 'function' && allBranchRecords.length) renderBranchList();
@@ -1641,7 +1642,7 @@
       }).join('');
     }
     async function loadCloudAdministration(force){
-      if (!cloudMode || !cloudSession || !cloudSession.systemAdmin || !cloudSession.mfaVerified || cloudSession.mode !== 'online') return;
+      if (!cloudMode || !cloudSession || !cloudSession.systemAdmin || cloudSession.mode !== 'online') return;
       if (cloudAdminLoading || (cloudAdminLoaded && !force)) return;
       cloudAdminLoading = true;
       try{
@@ -1744,12 +1745,24 @@
         return;
       }
       const role = document.getElementById('cloud-user-role').value;
+      const email = document.getElementById('cloud-user-email').value.trim().toLowerCase();
+      const username = document.getElementById('cloud-user-username').value.trim();
+      const displayName = document.getElementById('cloud-user-name').value.trim();
+      const temporaryPassword = document.getElementById('cloud-user-password').value;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        || !/^[A-Za-z0-9._-]{3,64}$/.test(username)
+        || displayName.length < 2 || displayName.length > 160
+        || temporaryPassword.length < 12
+        || !['employee','supervisor'].includes(role)){
+        showToast(uiText('تحقق من البريد، واستخدم معرفًا إنجليزيًا من 3 إلى 64 حرفًا، وكلمة مرور مؤقتة من 12 حرفًا على الأقل.','Check the email, use a 3–64 character English username, and enter a temporary password of at least 12 characters.'),true);
+        return;
+      }
       const request = {
         action:'create',
-        email:document.getElementById('cloud-user-email').value.trim(),
-        username:document.getElementById('cloud-user-username').value.trim(),
-        displayName:document.getElementById('cloud-user-name').value.trim(),
-        temporaryPassword:document.getElementById('cloud-user-password').value,
+        email:email,
+        username:username,
+        displayName:displayName,
+        temporaryPassword:temporaryPassword,
         assignments:branchIds.map(function(branchId){ return {branchId:branchId,role:role}; })
       };
       try{
@@ -1995,7 +2008,7 @@
 
     function renderBranchList(){
       const container = document.getElementById('branch-list');
-      const canManage = !cloudMode || Boolean(cloudSession && cloudSession.systemAdmin && cloudSession.mfaVerified && cloudSession.mode === 'online');
+      const canManage = !cloudMode || Boolean(cloudSession && cloudSession.systemAdmin && cloudSession.mode === 'online');
       const activeBranches = allBranchRecords.filter(function(branch){ return branch.active; });
       if (!activeBranches.length){
         container.innerHTML = '<div class="empty-state">' + uiText('لا توجد فروع مضافة.','No branches added.') + '</div>';

@@ -28,6 +28,15 @@ test('HTML IDs and print-template keys are unique', () => {
   assert.ok(templateIds.length >= 35, 'print template is missing mapped fields');
 });
 
+test('HTML validation patterns compile with the browser Unicode sets flag', () => {
+  const patterns = [...html.matchAll(/\spattern="([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(patterns.length > 0, 'expected HTML validation patterns');
+  patterns.forEach((pattern) => {
+    assert.doesNotThrow(() => new RegExp(`^(?:${pattern})$`, 'v'), `invalid HTML pattern: ${pattern}`);
+  });
+  assert.match(html, /\.auth-gate\[hidden\]\{display:none\}/);
+});
+
 test('entry workspace remains separate from the hidden A4 template', () => {
   assert.match(html, /id="service-order-template"/);
   assert.match(html, /#service-order-template\{display:none!important\}/);

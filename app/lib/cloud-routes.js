@@ -174,9 +174,9 @@ async function requireUsableSession(runtime, options = {}) {
 
 async function requireSystemAdministrator(runtime) {
   const status = await requireUsableSession(runtime, { allowOffline: false });
-  if (!status.systemAdmin || !status.mfaVerified) {
-    throw Object.assign(new Error('System administrator with MFA is required'), {
-      code: 'SYSTEM_ADMIN_WITH_AAL2_REQUIRED',
+  if (!status.systemAdmin) {
+    throw Object.assign(new Error('System administrator is required'), {
+      code: 'SYSTEM_ADMIN_REQUIRED',
       status: 403
     });
   }

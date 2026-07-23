@@ -49,8 +49,8 @@ async function userRpc(req: Request, functionName: string, body: Record<string, 
 
 async function requireSystemAdmin(req: Request) {
   const status = await userRpc(req, "session_status", {}) as Record<string, unknown>
-  if (status.systemAdmin !== true || status.deviceState !== "approved" || status.mfaVerified !== true) {
-    throw new Error("SYSTEM_ADMIN_WITH_AAL2_REQUIRED")
+  if (status.systemAdmin !== true || status.deviceState !== "approved") {
+    throw new Error("SYSTEM_ADMIN_REQUIRED")
   }
 }
 

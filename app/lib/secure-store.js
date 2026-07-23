@@ -21,6 +21,7 @@ function assertTestKey() {
 function runDpapi(operation, value, entropy) {
   const script = [
     "$ErrorActionPreference='Stop'",
+    "Add-Type -AssemblyName System.Security",
     '$inputValue=[Console]::In.ReadToEnd().Trim()',
     '$bytes=[Convert]::FromBase64String($inputValue)',
     `$entropy=[Convert]::FromBase64String('${entropy.toString('base64')}')`,
