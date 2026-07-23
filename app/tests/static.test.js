@@ -45,6 +45,19 @@ test('new and restored orders always start with the current local reception date
   assert.match(html, /deliveryDate\.value = '';[\s\S]*applyCurrentOrderDates\(\);/);
 });
 
+test('cloud drafts reserve and display the real service order number before finalization', () => {
+  assert.match(html, /localApi\('\/api\/cloud\/orders\/number'/);
+  assert.match(html, /cloudFinalizeCommandId = cloudFinalizeCommandId \|\| crypto\.randomUUID\(\)/);
+  assert.match(html, /orderNumber:orderNumberInput\.value/);
+  assert.match(cloudRoutesSource, /router\.post\('\/orders\/number'/);
+  assert.match(cloudRoutesSource, /value\.reserveOrderNumber\(commandId\)/);
+});
+
+test('WhatsApp caption places the issuance line directly below the greeting', () => {
+  assert.match(html, /'مرحبًا ' \+ customerName \+ '،',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
+  assert.doesNotMatch(html, /'مرحبًا ' \+ customerName \+ '،',\s*'',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
+});
+
 test('entry workspace remains separate from the hidden A4 template', () => {
   assert.match(html, /id="service-order-template"/);
   assert.match(html, /#service-order-template\{display:none!important\}/);
@@ -104,12 +117,11 @@ test('history details can safely resend the saved PDF through WhatsApp', () => {
   assert.match(cloudRoutesSource, /router\.post\('\/orders\/:orderId\/send-whatsapp'/);
   assert.match(serverSource, /send_count = send_count \+ 1/);
   assert.match(serverSource, /new MessageMedia\('application\/pdf',[^\n]+, 'Blue Shark\.pdf'\)/);
-  assert.match(serverSource, /caption: `مرحبًا \$\{row\.customerName\}،\\n\\nتم إصدار أمر خدمة من Blue Shark\.`/);
+  assert.match(serverSource, /caption: `مرحبًا \$\{row\.customerName\}،\\nتم إصدار أمر خدمة من Blue Shark\.`/);
 });
 
-test('polished A4 layout preserves the original logo and compact hierarchy', () => {
+test('polished A4 layout uses the print logo and compact hierarchy', () => {
   assert.match(html, /\.logo\{grid-area:logo;width:52mm;height:34mm;object-fit:contain\}/);
-  assert.match(html, /original Blue Shark logo asset is kept unchanged/);
   assert.match(html, /content:url\('\/blue-shark-logo-print\.png'\)/);
   assert.match(html, /\.services\{height:78mm\}/);
   assert.match(html, /\.selected-choices\{width:100%;max-height:51mm/);

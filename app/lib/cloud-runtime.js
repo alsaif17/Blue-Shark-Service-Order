@@ -407,6 +407,12 @@ class CloudRuntime {
     return data;
   }
 
+  async reserveOrderNumber(commandId) {
+    return this.callRpc('reserve_order_number', {
+      p_command_id: commandId
+    });
+  }
+
   async finalizeOrder(commandId, branchId, draft, expectedVersion = 0) {
     return this.callRpc('finalize_order', {
       p_command_id: commandId,

@@ -1134,8 +1134,18 @@
 
     async function requestNextOrderNumber(){
       if (cloudMode){
-        orderNumberInput.value = activeCloudOrder ? activeCloudOrder.orderNumber : '';
-        return orderNumberInput.value;
+        if (activeCloudOrder){
+          orderNumberInput.value = activeCloudOrder.orderNumber;
+          return orderNumberInput.value;
+        }
+        cloudFinalizeCommandId = cloudFinalizeCommandId || crypto.randomUUID();
+        const result = await localApi('/api/cloud/orders/number',{
+          method:'POST',
+          json:{commandId:cloudFinalizeCommandId}
+        });
+        orderNumberInput.value = result.orderNumber;
+        saveDraft();
+        return result.orderNumber;
       }
       const result = await localApi('/api/order-number/next',{method:'POST'});
       orderNumberInput.value = result.orderNumber;
@@ -1162,7 +1172,7 @@
     }
     function storedDraft(){
       return {
-        orderNumber:cloudMode ? '' : orderNumberInput.value,
+        orderNumber:orderNumberInput.value,
         fields:collectDraftFields(),
         services:savedServices,
         cloudOrder:cloudMode ? activeCloudOrder : null,
@@ -1214,6 +1224,7 @@
         cloudDocumentCommandId = cloudMode ? (draft.cloudDocumentCommandId || null) : null;
         orderNumberInput.value = cloudMode && activeCloudOrder ? activeCloudOrder.orderNumber : (draft.orderNumber || '');
         await ensureCurrentOrderNumber();
+        if (cloudMode && !orderNumberInput.value) await requestNextOrderNumber();
         const fields = draft.fields || {};
         Object.keys(fields).forEach(function(key){
           if (key.startsWith('radio:')){
@@ -2458,7 +2469,6 @@
       const customerName = document.getElementById('customer-name').value.trim();
       return [
         'مرحبًا ' + customerName + '،',
-        '',
         'تم إصدار أمر خدمة من Blue Shark.'
       ].join('\n');
     }

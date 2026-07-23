@@ -1,5 +1,5 @@
 begin;
-select plan(26);
+select plan(28);
 
 select has_schema('app', 'internal app schema exists');
 select has_schema('api', 'dedicated api schema exists');
@@ -40,6 +40,24 @@ select ok(
     'execute'
   ),
   'authenticated role can call the guarded finalization rpc'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'api.reserve_order_number(uuid)',
+    'execute'
+  ),
+  'anonymous role cannot reserve order numbers'
+);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'api.reserve_order_number(uuid)',
+    'execute'
+  ),
+  'authenticated users can call the approved-device number reservation rpc'
 );
 
 select ok(

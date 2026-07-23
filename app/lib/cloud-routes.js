@@ -427,6 +427,18 @@ function createCloudRouter(options) {
     }
   });
 
+  router.post('/orders/number', async (req, res) => {
+    try {
+      const value = runtime();
+      await requireUsableSession(value, { allowOffline: false });
+      const commandId = uuid(req.body?.commandId || crypto.randomUUID(), 'command id');
+      const result = await value.reserveOrderNumber(commandId);
+      res.status(201).json({ ok: true, commandId, orderNumber: result.orderNumber });
+    } catch (error) {
+      responseError(res, error);
+    }
+  });
+
   router.post('/orders/finalize', async (req, res) => {
     try {
       const value = runtime();

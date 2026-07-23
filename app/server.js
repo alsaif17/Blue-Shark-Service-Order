@@ -1600,7 +1600,7 @@ app.post('/api/orders/:orderNumber/resend', requireToken, async (req, res) => {
     const media = new MessageMedia('application/pdf', pdfBuffer.toString('base64'), 'Blue Shark.pdf');
     deliveryAttempted = true;
     const message = await withTimeout(waClient.sendMessage(registeredId._serialized, media, {
-      caption: `مرحبًا ${row.customerName}،\n\nتم إصدار أمر خدمة من Blue Shark.`,
+      caption: `مرحبًا ${row.customerName}،\nتم إصدار أمر خدمة من Blue Shark.`,
       sendMediaAsDocument: true
     }), 90000, 'SEND_TIMEOUT');
     deliveryConfirmed = true;
