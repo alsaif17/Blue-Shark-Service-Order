@@ -51,11 +51,13 @@ test('cloud drafts reserve and display the real service order number before fina
   assert.match(html, /orderNumber:orderNumberInput\.value/);
   assert.match(cloudRoutesSource, /router\.post\('\/orders\/number'/);
   assert.match(cloudRoutesSource, /value\.reserveOrderNumber\(commandId\)/);
+  assert.match(html, /if \(cloudMode && !activeCloudOrder\) await requestNextOrderNumber\(\)/);
 });
 
 test('WhatsApp caption places the issuance line directly below the greeting', () => {
-  assert.match(html, /'مرحبًا ' \+ customerName \+ '،',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
-  assert.doesNotMatch(html, /'مرحبًا ' \+ customerName \+ '،',\s*'',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
+  assert.match(html, /function customerWhatsAppCaption\(customerName\)/);
+  assert.match(html, /'مرحبًا ' \+ String\(customerName \|\| ''\)\.trim\(\) \+ '،',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
+  assert.doesNotMatch(html, /'مرحبًا ' \+ [^\n]+,\s*'',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
 });
 
 test('entry workspace remains separate from the hidden A4 template', () => {
@@ -115,6 +117,8 @@ test('history details can safely resend the saved PDF through WhatsApp', () => {
   assert.match(html, /'\/send-whatsapp'/);
   assert.match(serverSource, /app\.post\('\/api\/orders\/:orderNumber\/resend'/);
   assert.match(cloudRoutesSource, /router\.post\('\/orders\/:orderId\/send-whatsapp'/);
+  assert.match(html, /caption:customerWhatsAppCaption\(selectedHistoryOrder\.customerName\)/);
+  assert.match(cloudRoutesSource, /customerWhatsAppCaption\(detail\.order\.customer_name\)/);
   assert.match(serverSource, /send_count = send_count \+ 1/);
   assert.match(serverSource, /new MessageMedia\('application\/pdf',[^\n]+, 'Blue Shark\.pdf'\)/);
   assert.match(serverSource, /caption: `مرحبًا \$\{row\.customerName\}،\\nتم إصدار أمر خدمة من Blue Shark\.`/);

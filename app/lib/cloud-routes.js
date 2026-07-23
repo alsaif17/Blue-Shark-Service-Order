@@ -27,6 +27,10 @@ function normalizePhone(value) {
   return /^\d{8,15}$/.test(digits) ? `+${digits}` : null;
 }
 
+function customerWhatsAppCaption(customerName) {
+  return `مرحبًا ${cleanText(customerName, 200)}،\nتم إصدار أمر خدمة من Blue Shark.`;
+}
+
 function cleanDraft(source) {
   if (!source || typeof source !== 'object' || Array.isArray(source)) {
     throw Object.assign(new Error('Order draft must be an object'), { code: 'INVALID_ORDER_DATA', status: 400 });
@@ -568,7 +572,7 @@ function createCloudRouter(options) {
         return deliverWhatsApp({
           phone,
           pdf,
-          caption: cleanText(req.body?.caption, 1000) || `Blue Shark service order ${detail.order.order_number}`
+          caption: cleanText(req.body?.caption, 1000) || customerWhatsAppCaption(detail.order.customer_name)
         });
       });
       effectStarted = true;
@@ -685,6 +689,7 @@ function createCloudRouter(options) {
 module.exports = {
   createCloudRouter,
   cleanDraft,
+  customerWhatsAppCaption,
   normalizePhone,
   requireUsableSession,
   UUID_PATTERN

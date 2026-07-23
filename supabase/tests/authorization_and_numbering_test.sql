@@ -1,5 +1,5 @@
 begin;
-select plan(28);
+select plan(29);
 
 select has_schema('app', 'internal app schema exists');
 select has_schema('api', 'dedicated api schema exists');
@@ -58,6 +58,18 @@ select ok(
     'execute'
   ),
   'authenticated users can call the approved-device number reservation rpc'
+);
+
+select is(
+  (
+    select string_agg(a.attname, ',' order by keys.ordinality)
+    from pg_index i
+    cross join lateral unnest(i.indkey) with ordinality as keys(attnum, ordinality)
+    join pg_attribute a on a.attrelid = i.indrelid and a.attnum = keys.attnum
+    where i.indrelid = 'app.command_results'::regclass and i.indisprimary
+  ),
+  'command_id,operation',
+  'idempotency keys are unique per operation'
 );
 
 select ok(

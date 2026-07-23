@@ -1224,7 +1224,7 @@
         cloudDocumentCommandId = cloudMode ? (draft.cloudDocumentCommandId || null) : null;
         orderNumberInput.value = cloudMode && activeCloudOrder ? activeCloudOrder.orderNumber : (draft.orderNumber || '');
         await ensureCurrentOrderNumber();
-        if (cloudMode && !orderNumberInput.value) await requestNextOrderNumber();
+        if (cloudMode && !activeCloudOrder) await requestNextOrderNumber();
         const fields = draft.fields || {};
         Object.keys(fields).forEach(function(key){
           if (key.startsWith('radio:')){
@@ -2235,7 +2235,13 @@
         const resendEndpoint = cloudMode
           ? '/api/cloud/orders/' + encodeURIComponent(historyIdentifier) + '/send-whatsapp'
           : '/api/orders/' + encodeURIComponent(historyIdentifier) + '/resend';
-        await localApi(resendEndpoint,cloudMode ? {method:'POST',json:{actionId:crypto.randomUUID()}} : {method:'POST'});
+        await localApi(resendEndpoint,cloudMode ? {
+          method:'POST',
+          json:{
+            actionId:crypto.randomUUID(),
+            caption:customerWhatsAppCaption(selectedHistoryOrder.customerName)
+          }
+        } : {method:'POST'});
         await loadHistory();
         await showHistoryOrder(historyIdentifier);
         showToast(uiText('تمت إعادة إرسال أمر الخدمة بنجاح دون إنشاء رقم جديد.','The service order was resent successfully without creating a new number.'));
@@ -2465,12 +2471,15 @@
       return String(label || '').split('|')[0].trim();
     }
 
-    function buildWhatsAppCaption(){
-      const customerName = document.getElementById('customer-name').value.trim();
+    function customerWhatsAppCaption(customerName){
       return [
-        'مرحبًا ' + customerName + '،',
+        'مرحبًا ' + String(customerName || '').trim() + '،',
         'تم إصدار أمر خدمة من Blue Shark.'
       ].join('\n');
+    }
+
+    function buildWhatsAppCaption(){
+      return customerWhatsAppCaption(document.getElementById('customer-name').value);
     }
 
     function fullCustomerPhone(){
