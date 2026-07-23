@@ -1339,9 +1339,14 @@ declare
   v_path text;
 begin
   perform app.touch_request();
-  select o.branch_id, d into v_branch_id, v_document
-  from app.orders o join app.order_documents d on d.order_id = o.id
+  select o.branch_id into v_branch_id
+  from app.orders o
   where o.id = p_order_id and o.status = 'finalized';
+  if found then
+    select d.* into v_document
+    from app.order_documents d
+    where d.order_id = p_order_id;
+  end if;
   if not found or not app.can_access_branch(v_branch_id, false) then
     raise exception 'order not found' using errcode = 'P0002';
   end if;

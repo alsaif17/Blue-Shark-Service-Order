@@ -128,6 +128,9 @@ class CloudRuntime {
     }
 
     this.client = createClient(this.configuration.url, this.configuration.publishableKey, {
+      db: {
+        schema: 'api'
+      },
       auth: {
         persistSession: false,
         autoRefreshToken: true,

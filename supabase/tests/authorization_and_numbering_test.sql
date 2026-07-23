@@ -99,8 +99,8 @@ select ok(
 );
 
 select ok(
-  position('current_is_aal2' in pg_get_functiondef('app.current_is_system_admin()'::regprocedure)) > 0,
-  'system administrator checks require aal2'
+  position('current_is_aal2' in pg_get_functiondef('app.current_is_system_admin()'::regprocedure)) = 0,
+  'system administrator checks accept password-authenticated sessions'
 );
 
 select ok(

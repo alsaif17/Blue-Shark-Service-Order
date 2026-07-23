@@ -18,6 +18,8 @@ work/
 release/
 app/test-runs/
 app/pdfs/
+backup/
+password-recovery-site/
 
 # Logs and temporary files
 *.log

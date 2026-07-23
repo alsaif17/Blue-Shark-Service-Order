@@ -156,11 +156,15 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:32147"
+site_url = "https://blue-shark-password-recovery.pages.dev/"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://127.0.0.1:32147", "http://localhost:32147"]
+additional_redirect_urls = [
+  "https://blue-shark-password-recovery.pages.dev/",
+  "http://127.0.0.1:32147",
+  "http://localhost:32147"
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 900
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -434,6 +438,11 @@ entrypoint = "./functions/admin-users/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/admin-users/*.html" ]
+
+[functions.password-recovery]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/password-recovery/index.ts"
 
 [functions.update-check]
 enabled = true
