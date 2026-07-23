@@ -58,6 +58,8 @@ test('WhatsApp caption places the issuance line directly below the greeting', ()
   assert.match(html, /function customerWhatsAppCaption\(customerName\)/);
   assert.match(html, /'مرحبًا ' \+ String\(customerName \|\| ''\)\.trim\(\) \+ '،',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
   assert.doesNotMatch(html, /'مرحبًا ' \+ [^\n]+,\s*'',\s*'تم إصدار أمر خدمة من Blue Shark\.'/);
+  assert.match(cloudRoutesSource, /function cleanMultilineText\(value, maximum = 1000\)/);
+  assert.match(cloudRoutesSource, /caption: cleanMultilineText\(req\.body\?\.caption, 1000\)/);
 });
 
 test('entry workspace remains separate from the hidden A4 template', () => {
@@ -127,6 +129,7 @@ test('history details can safely resend the saved PDF through WhatsApp', () => {
 test('polished A4 layout uses the print logo and compact hierarchy', () => {
   assert.match(html, /\.logo\{grid-area:logo;width:52mm;height:34mm;object-fit:contain\}/);
   assert.match(html, /content:url\('\/blue-shark-logo-print\.png'\)/);
+  assert.match(html, /printTemplate\.querySelector\('\.logo'\)\.src = '\/blue-shark-logo-print\.png'/);
   assert.match(html, /\.services\{height:78mm\}/);
   assert.match(html, /\.selected-choices\{width:100%;max-height:51mm/);
   assert.match(html, /classList\.toggle\('services-compact', savedServices\.length >= 5\)/);

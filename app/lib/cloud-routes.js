@@ -12,6 +12,14 @@ function cleanText(value, maximum = 200) {
   return String(value || '').trim().replace(/[\u0000-\u001f]+/g, ' ').slice(0, maximum);
 }
 
+function cleanMultilineText(value, maximum = 1000) {
+  return String(value || '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0009\u000b-\u001f]+/g, ' ')
+    .trim()
+    .slice(0, maximum);
+}
+
 function uuid(value, label) {
   const normalized = String(value || '').toLowerCase();
   if (!UUID_PATTERN.test(normalized)) {
@@ -572,7 +580,7 @@ function createCloudRouter(options) {
         return deliverWhatsApp({
           phone,
           pdf,
-          caption: cleanText(req.body?.caption, 1000) || customerWhatsAppCaption(detail.order.customer_name)
+          caption: cleanMultilineText(req.body?.caption, 1000) || customerWhatsAppCaption(detail.order.customer_name)
         });
       });
       effectStarted = true;
@@ -689,6 +697,7 @@ function createCloudRouter(options) {
 module.exports = {
   createCloudRouter,
   cleanDraft,
+  cleanMultilineText,
   customerWhatsAppCaption,
   normalizePhone,
   requireUsableSession,

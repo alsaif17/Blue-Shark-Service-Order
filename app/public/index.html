@@ -589,6 +589,7 @@
   <script src="/vendor/html2pdf.bundle.min.js"></script>
   <script>
     const printTemplate = document.getElementById('service-order-template');
+    printTemplate.querySelector('.logo').src = '/blue-shark-logo-print.png';
     const templateElements = new Map();
     printTemplate.querySelectorAll('[data-template-id]').forEach(function(element){
       templateElements.set(element.dataset.templateId,element);
